@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 website:
-  title: "demosite"
+  title: "Coupon Collector’s Problem"
   navbar:
     left:
       - href: index.qmd
