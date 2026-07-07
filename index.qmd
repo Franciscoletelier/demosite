@@ -1,11 +1,20 @@
 ---
-title: "demosite"
+title: "Francisco Letelier"
 ---
 
-This is a Quarto website.
-
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+Sitio dedicado a visualizar proyectos personales.
 
 ```{r}
-1 + 1
+#| label: setup
+#| include: true
+
+
+a <- 1
+b <- 2
+
+c <- a + b
+
+print(c)
+
+
 ```
