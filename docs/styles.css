@@ -1,61 +1,277 @@
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.3);
-  --glass-shadow: rgba(31, 38, 135, 0.15);
+  --brand-blue: #2563eb;
+  --brand-blue-dark: #1d4ed8;
+  --brand-indigo: #4f46e5;
+  --slate-900: #0f172a;
+  --slate-700: #334155;
+  --slate-600: #475569;
+  --slate-500: #64748b;
+  --slate-400: #94a3b8;
+  --slate-100: #f1f5f9;
+  --slate-50: #f8fafc;
+  --page-bg: #fafafa;
 }
-
-/*Opción 3 — Multicolor sutil (radial, tipo "aurora") */
-
 
 body {
-  background:
-    radial-gradient(circle at 15% 20%, rgba(66, 133, 244, 0.55) 0%, transparent 45%),
-    radial-gradient(circle at 85% 15%, rgba(234, 67, 53, 0.35) 0%, transparent 40%),
-    radial-gradient(circle at 80% 85%, rgba(52, 168, 83, 0.35) 0%, transparent 40%),
-    radial-gradient(circle at 20% 90%, rgba(251, 188, 5, 0.3) 0%, transparent 40%),
-    linear-gradient(135deg, #004182 0%, #0A66C2 100%);
-  background-attachment: fixed;
-  min-height: 100vh;
+  background-color: var(--page-bg);
+  color: var(--slate-700);
+  font-family: "Inter", sans-serif;
 }
 
-/* Navbar con efecto vidrio */
+/* ---- Navbar tipo header sticky con blur ---- */
 .navbar {
-  background: var(--glass-bg) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--glass-border);
-  box-shadow: 0 4px 30px var(--glass-shadow);
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--slate-100);
 }
 
-/* Contenedor principal del contenido */
-main.content, .quarto-container {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px var(--glass-shadow);
-  padding: 2rem;
-  margin-top: 1.5rem;
+.navbar-brand {
+  font-weight: 800;
+  color: var(--slate-900) !important;
+  letter-spacing: -0.02em;
 }
 
-/* Tarjetas (por ejemplo, en un listado de posts) */
-.card, .quarto-grid-item {
-  background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+.navbar-nav .nav-link {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--slate-600) !important;
+  transition: color 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--brand-blue) !important;
+}
+
+/* ---- Encabezados ---- */
+h1, h2, h3, h4 {
+  color: var(--slate-900);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: 2.75rem; }
+h2 { font-size: 1.85rem; margin-top: 2.5rem; }
+
+/* ---- Enlaces ---- */
+a {
+  color: var(--brand-blue);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--brand-blue-dark);
+  text-decoration: underline;
+}
+
+/* ---- Cuerpo de artículo estilo editorial ---- */
+main.content p {
+  font-family: Georgia, serif;
+  font-size: 1.15rem;
+  line-height: 1.75;
+  color: var(--slate-700);
+}
+
+main.content p:first-of-type::first-letter {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--brand-blue);
+  float: left;
+  margin-right: 0.6rem;
+  line-height: 1;
+}
+
+/* ---- Tarjetas (callout, listing, etc.) ---- */
+.card, .callout, .quarto-grid-item {
+  background: #ffffff;
+  border: 1px solid var(--slate-100);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .card:hover, .quarto-grid-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px var(--glass-shadow);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  transform: translateY(-2px);
 }
 
-/* Footer */
-.page-footer {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid var(--glass-border);
+/* ---- Callout tipo "bloque destacado" ---- */
+.callout-note {
+  background: rgba(37, 99, 235, 0.05);
+  border-left: 4px solid var(--brand-blue);
+  border-radius: 0 12px 12px 0;
 }
+
+/* ---- Badges / etiquetas tipo "pill" ---- */
+.badge, .quarto-category {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--brand-blue-dark);
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+}
+
+/* ---- Botones ---- */
+.btn, .btn-primary {
+  background: var(--brand-blue);
+  border: none;
+  color: white;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.5rem 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.btn:hover, .btn-primary:hover {
+  background: var(--brand-blue-dark);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+}
+
+/* ---- Sección oscura tipo "hero interactivo" ---- */
+.dark-section {
+  background: linear-gradient(135deg, var(--slate-900) 0%, #1e1b4b 100%);
+  color: #ffffff;
+  padding: 4rem 0;
+  border-radius: 16px;
+}
+
+.dark-section h2, .dark-section h3 {
+  color: #ffffff;
+}
+
+.dark-section p {
+  color: var(--slate-400);
+}
+
+/* ---- Footer ---- */
+.page-footer, footer {
+  background: var(--slate-900);
+  color: var(--slate-400);
+  border-top: 1px solid #1e293b;
+}
+
+.page-footer a, footer a {
+  color: var(--slate-400);
+}
+
+.page-footer a:hover, footer a:hover {
+  color: #ffffff;
+}
+
+/* ---- Blockquote tipo cita destacada ---- */
+blockquote {
+  border-left: 4px solid var(--brand-indigo);
+  background: rgba(79, 70, 229, 0.04);
+  padding: 1rem 1.25rem;
+  border-radius: 0 10px 10px 0;
+  font-style: italic;
+  color: var(--slate-600);
+}
+
+/* ---- Galería de posts (posts.qmd) ---- */
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.post-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-100);
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.post-card:hover {
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  transform: translateY(-3px);
+}
+
+.post-card-tag {
+  display: inline-block;
+  align-self: flex-start;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--brand-blue-dark);
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  margin-bottom: 0.75rem;
+}
+
+.post-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.6rem;
+  font-size: 1.25rem;
+}
+
+.post-card h3 a {
+  color: var(--slate-900);
+  text-decoration: none;
+}
+
+.post-card h3 a:hover {
+  color: var(--brand-blue);
+}
+
+.post-card p {
+  color: var(--slate-600);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+.post-card-meta {
+  font-size: 0.78rem;
+  color: var(--slate-400);
+  margin: 0.5rem 0 1rem;
+}
+
+.post-card-meta i {
+  color: var(--brand-blue);
+  margin-right: 0.2rem;
+}
+
+.post-card-link {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--brand-blue);
+  text-decoration: none;
+  margin-top: auto;
+}
+
+.post-card-link:hover {
+  color: var(--brand-blue-dark);
+  text-decoration: underline;
+}
+
+/* Tarjeta "próximamente" con estilo atenuado */
+.post-card-placeholder {
+  border-style: dashed;
+  background: var(--slate-50);
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.post-card-placeholder .post-card-tag {
+  background: var(--slate-100);
+  color: var(--slate-500);
+}
+
+.post-card-placeholder h3 {
+  color: var(--slate-400);
+}
+
+.post-card-placeholder p {
+  color: var(--slate-400);
+}
+
+

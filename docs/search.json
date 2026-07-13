@@ -1,16 +1,16 @@
 [
   {
+    "objectID": "posts.html",
+    "href": "posts.html",
+    "title": "Artículos",
+    "section": "",
+    "text": "Estadística · Interactivo\n\n¿Destino o Estadística?\nLos secretos de cómo la probabilidad explica las coincidencias más asombrosas de nuestras vidas — con simulador de la paradoja de los cumpleaños, calculadora de azar y un experimento de percepción en vivo.\n 8 min  ·   Contenido interactivo\nLeer artículo →\n\n\n\nPróximamente\n\nNuevo artículo\nAquí aparecerá tu próximo post. Duplica una tarjeta como la de arriba y cambia el título, la descripción y el enlace."
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Francisco Letelier",
     "section": "",
-    "text": "Sitio dedicado a visualizar proyectos personales.\n\n\nCode\na &lt;- 1\nb &lt;- 2\n\nc &lt;- a + b\n\nprint(c)\n\n\n[1] 3"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
+    "text": "Sitio dedicado a visualizar proyectos personales."
   }
 ]

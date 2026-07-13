@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Destino o Estadística? Los Secretos de las Coincidencias</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Georgia', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f7fa',
+                            100: '#e4ebf4',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e293b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js para visualizar curvas matemáticas de coincidencia -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- KaTeX para renderizado matemático elegante -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <style>
+        .latex-inline { display: inline-block; }
+        .latex-block { display: block; margin: 1rem 0; text-align: center; }
+    </style>
+</head>
+<body class="bg-[#fafafa] text-slate-800 font-sans antialiased selection:bg-blue-100 selection:text-blue-900">
+
+    <div class="bg-slate-900 text-slate-300 text-xs">
+        <div class="max-w-6xl mx-auto px-4 h-9 flex items-center">
+            <a href="../index.html" class="flex items-center gap-1.5 hover:text-white transition-colors font-semibold">
+                <i class="fa-solid fa-arrow-left"></i> Volver al sitio
+            </a>
+            <span class="mx-2 text-slate-600">/</span>
+            <a href="../posts.html" class="hover:text-white transition-colors">Artículos</a>
+        </div>
+    </div>
+
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-9 h-9 rounded-lg flex items-center justify-center font-bold text-lg shadow-md shadow-blue-200">
+                    <i class="fa-solid fa-calculator text-sm"></i>
+                </span>
+                <span class="font-bold text-slate-800 tracking-tight text-lg">Asistente Editor <span class="text-blue-600">|</span> Ciencia</span>
+            </div>
+            <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-600">
+                <a href="#articulo" class="hover:text-blue-600 transition-colors">Artículo</a>
+                <a href="#simulador" class="hover:text-blue-600 transition-colors">Paradoja de Cumpleaños</a>
+                <a href="#calculadora" class="hover:text-blue-600 transition-colors">Calculadora de Azar</a>
+                <a href="#percepcion" class="hover:text-blue-600 transition-colors">Test de Percepción</a>
+                <a href="#referencias" class="hover:text-blue-600 transition-colors">Referencias</a>
+            </nav>
+            <div class="flex items-center">
+                <a href="#simulador" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-full transition-all hover:shadow-lg hover:shadow-blue-200">
+                    Probar Simuladores
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative overflow-hidden bg-gradient-to-b from-blue-50/50 via-white to-white py-12 md:py-20">
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-6">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>Divulgación Estadística & Matemática
+            </span>
+            <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight md:leading-none mb-6">
+                ¿Destino o Estadística?
+            </h1>
+            <p class="text-xl md:text-2xl font-light text-slate-500 max-w-2xl mx-auto leading-relaxed mb-8">
+                Los secretos de cómo la probabilidad explica las coincidencias más asombrosas de nuestras vidas.
+            </p>
+            <div class="flex items-center justify-center space-x-4 mb-10">
+                <div class="flex -space-x-2">
+                    <span class="w-10 h-10 rounded-full border-2 border-white bg-blue-600 text-white flex items-center justify-center font-bold text-xs">PD</span>
+                    <span class="w-10 h-10 rounded-full border-2 border-white bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">FM</span>
+                </div>
+                <div class="text-left text-xs text-slate-500">
+                    <p class="font-bold text-slate-700 text-sm">Basado en Persi Diaconis & Frederick Mosteller</p>
+                    <p>Adaptado y diseñado por Asistente Editor</p>
+                </div>
+            </div>
+            
+            <div class="border-t border-b border-slate-100 py-4 flex flex-wrap gap-6 justify-center text-xs font-medium text-slate-500">
+                <span><i class="fa-regular fa-clock mr-1"></i> Lectura de 8 min</span>
+                <span><i class="fa-solid fa-flask mr-1"></i> Contenido Interactivo</span>
+                <span><i class="fa-solid fa-graduation-cap mr-1"></i> Rigor Científico</span>
+            </div>
+        </div>
+    </main>
+
+    <section id="articulo" class="max-w-3xl mx-auto px-4 pb-16">
+        <article class="prose prose-slate max-w-none text-slate-700 leading-relaxed font-serif text-lg md:text-xl space-y-6">
+            <p class="first-letter:text-5xl first-letter:font-extrabold first-letter:text-blue-600 first-letter:mr-3 first-letter:float-left">
+                ¿Alguna vez has pensado en un amigo de la infancia al que no ves en años y, de repente, te lo encuentras en el supermercado esa misma tarde? ¿O tal vez has comprado un libro y descubres que el protagonista comparte tu fecha de nacimiento y tu misma profesión? 
+            </p>
+            <p>
+                Para el célebre psiquiatra Carl Jung, estos eventos no eran meras casualidades, sino muestras de la <strong>sincronicidad</strong>, una supuesta fuerza acausal capaz de conectar de manera física y psíquica el universo. Sin embargo, en 1989, los prestigiosos estadísticos de la Universidad de Harvard y Stanford, Persi Diaconis y Frederick Mosteller, decidieron poner las cartas sobre la mesa y analizar estos misterios bajo la implacable óptica de las matemáticas en su influyente artículo <em>Methods for Studying Coincidences</em>.
+            </p>
+            <p>
+                La traducción formal de estos hallazgos, integrada en el documento científico <span class="font-sans font-semibold text-blue-600 underline cursor-help decoration-dotted" title="Recurso principal en español del que bebe este análisis">"Métodos Estadísticos para el estudio de las coincidencias"</span>, reveló una conclusión contundente: <strong>no necesitamos apelar a fuerzas místicas ni paranormales para comprender lo extraordinario; la matemática de la probabilidad lo hace de forma natural y elegante</strong>.
+            </p>
+
+            <!-- Bloque destacado -->
+            <div class="my-8 p-6 bg-blue-50/50 border-l-4 border-blue-600 rounded-r-xl font-sans not-italic text-sm md:text-base text-slate-800">
+                <p class="font-bold text-blue-800 text-lg mb-2"><i class="fa-solid fa-quote-left mr-2 opacity-50"></i>¿Qué es una coincidencia?</p>
+                Para los autores, es una sorprendente concurrencia de sucesos que es percibida como significativamente relacionada por un observador, pero que carece de una conexión causal aparente. Es la psicología humana la que aporta el componente de "sorpresa" y "significado".
+            </div>
+
+            <h2 class="font-sans font-extrabold text-2xl md:text-3xl text-slate-900 tracking-tight pt-4">Los Cuatro Pilares de la Coincidencia</h2>
+            <p>
+                Una vez descontados los sucesos con causas evidentes, Diaconis y Mosteller establecieron que la inmensa mayoría de las coincidencias misteriosas pueden ser explicadas detalladamente por **cuatro principios fundamentales**:
+            </p>
+
+            <div class="font-sans text-sm md:text-base my-8 space-y-4">
+                <div class="p-5 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <span class="text-xs font-bold text-blue-600 tracking-wider uppercase block mb-1">Principio 1</span>
+                    <h3 class="font-bold text-slate-900 text-lg mb-2">La Causa Oculta (Hidden Cause)</h3>
+                    <p class="text-slate-600">A menudo existen factores desencadenantes invisibles a simple vista. Por ejemplo, encontrarte con un antiguo vecino en un hostal en otro continente puede parecer una casualidad cósmica, pero la probabilidad real aumenta si ambos comparten intereses socioeconómicos o si se guían por las mismas guías de viaje recomendadas en internet.</p>
+                </div>
+
+                <div class="p-5 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <span class="text-xs font-bold text-indigo-600 tracking-wider uppercase block mb-1">Principio 2</span>
+                    <h3 class="font-bold text-slate-900 text-lg mb-2">Psicología, Memoria Selectiva y Percepción</h3>
+                    <p class="text-slate-600">Nuestro cerebro es un detector incansable de patrones. Registramos y recordamos de manera vívida y emocional los "aciertos" (el día que soñamos que un avión caía y de verdad hubo un accidente), pero borramos de nuestra memoria los miles de "errores" (las noches donde soñamos catástrofes que nunca sucedieron).</p>
+                </div>
+
+                <div class="p-5 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase block mb-1">Principio 3</span>
+                    <h3 class="font-bold text-slate-900 text-lg mb-2">Multiplicidad de Desenlaces (Multiple Endpoints)</h3>
+                    <p class="text-slate-600">Los seres humanos somos sumamente generosos al clasificar qué cuenta como "coincidencia". Si dos amigas comparten el mismo cumpleaños, lo consideramos un hito directo. Pero si nacieron con un día de diferencia, en el mismo mes, o si una comparte el cumpleaños de la madre de la otra, ¡también lo celebramos como coincidencia! Al dilatar los límites de "cercanía", la probabilidad del evento aumenta exponencialmente de forma silenciosa.</p>
+                </div>
+
+                <div class="p-5 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <span class="text-xs font-bold text-purple-600 tracking-wider uppercase block mb-1">Principio 4</span>
+                    <h3 class="font-bold text-slate-900 text-lg mb-2">La Ley de los Números Verdaderamente Grandes</h3>
+                    <p class="text-slate-600">Establece que en una muestra lo suficientemente grande, **cualquier suceso escandalosamente raro está destinado a suceder**. Si la probabilidad de un evento increíble es de uno en un millón por día, y lo medimos en la población de un país como EE.UU. (330+ millones), ese suceso ocurrirá estadísticamente unas 330 veces por día, o más de 120,000 veces al año.</p>
+                </div>
+            </div>
+
+            <blockquote class="border-l-4 border-indigo-600 pl-4 py-1 my-6 italic text-slate-600 font-sans text-sm md:text-base bg-indigo-50/40 p-4 rounded-r-lg">
+                <p class="mb-2">"El evento que tiene 'una oportunidad entre un millón' ocurrirá, sin duda, con la frecuencia que le corresponde, por mucho que nos sorprenda que nos ocurra a nosotros."</p>
+                <cite class="font-bold text-slate-800 block text-xs not-italic">— R. A. Fisher (1937)</cite>
+            </blockquote>
+        </article>
+    </section>
+
+    <section id="simulador" class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white py-16 scroll-mt-12">
+        <div class="max-w-5xl mx-auto px-4">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="text-xs font-extrabold text-blue-400 tracking-widest uppercase block mb-2">Laboratorio Interactivo</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">La Paradoja de los Cumpleaños</h2>
+                <p class="text-slate-400 mt-2">
+                    Nuestra mente asume que requerimos un número gigante de personas para hallar fechas compartidas. La realidad matemática desafía completamente la intuición.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <!-- Control y Simulación -->
+                <div class="lg:col-span-5 bg-slate-800/80 backdrop-blur border border-slate-700/50 p-6 rounded-2xl shadow-xl">
+                    <h3 class="font-bold text-lg mb-4 text-blue-300">Ajusta el Tamaño del Grupo</h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label for="groupSize" class="text-sm text-slate-300">Cantidad de personas en la sala:</label>
+                                <span id="groupSizeValue" class="text-2xl font-extrabold text-white bg-blue-600 px-3 py-1 rounded-lg">23</span>
+                            </div>
+                            <input type="range" id="groupSize" min="2" max="100" value="23" 
+                                   class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                        </div>
+
+                        <!-- Panel de Probabilidad -->
+                        <div class="grid grid-cols-2 gap-4 py-4 border-t border-b border-slate-700/50">
+                            <div>
+                                <span class="text-xs text-slate-400 block">Probabilidad Teórica</span>
+                                <span id="theoreticalProb" class="text-3xl font-black text-emerald-400">50.7%</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-400 block">Fórmula Simplificada</span>
+                                <span class="text-sm font-mono text-slate-300 block mt-1">N ≈ 1.2 &radic;c</span>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="space-y-2">
+                            <button id="btnRunSim" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-play"></i> Ejecutar 1,000 Simulaciones
+                            </button>
+                            <button id="btnResetSim" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium py-2 px-4 rounded-xl transition-all text-xs">
+                                <i class="fa-solid fa-rotate-left mr-1"></i> Reiniciar
+                            </button>
+                        </div>
+
+                        <!-- Historial en vivo / Resultados -->
+                        <div id="simStats" class="bg-slate-900/60 rounded-xl p-4 text-xs text-slate-400 space-y-1">
+                            <div class="flex justify-between">
+                                <span>Simulaciones totales:</span>
+                                <span id="statTotal" class="font-mono text-white">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Grupos con coincidencia:</span>
+                                <span id="statMatches" class="font-mono text-emerald-400">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Tasa empírica obtenida:</span>
+                                <span id="statRate" class="font-mono text-blue-300 font-bold">0.00%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Probabilidad -->
+                <div class="lg:col-span-7 bg-slate-800/80 backdrop-blur border border-slate-700/50 p-6 rounded-2xl shadow-xl flex flex-col justify-between h-full min-h-[350px]">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg text-slate-200">Curva de Probabilidad Acumulada</h3>
+                        <span class="text-xs text-slate-400"><i class="fa-solid fa-circle text-blue-500 mr-1"></i> Punto actual</span>
+                    </div>
+                    <div class="relative w-full flex-grow" style="height: 250px;">
+                        <canvas id="probabilityChart"></canvas>
+                    </div>
+                    <div class="text-xs text-slate-400 mt-4 leading-relaxed bg-slate-900/30 p-3 rounded-lg border border-slate-700/30">
+                        <i class="fa-solid fa-circle-info text-blue-400 mr-1"></i> Observa cómo con solo <strong>23 personas</strong>, la curva supera el umbral del 50%. Al llegar a <strong>50 personas</strong>, la probabilidad es del <strong>97%</strong>. ¡Prácticamente garantizado!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="calculadora" class="py-16 bg-white scroll-mt-12">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <span class="text-xs font-extrabold text-blue-600 tracking-widest uppercase block mb-2">Herramienta Matemática</span>
+                <h2 class="text-3xl font-extrabold text-slate-900">Calculadora del Azar Universal</h2>
+                <p class="text-slate-500 mt-2">
+                    ¿Te preguntas cuántas personas o intentos necesitas para forzar una casualidad en otro campo de la vida? Utiliza la aproximación generalizada de Diaconis-Mosteller.
+                </p>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-100 p-8 rounded-3xl shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <!-- Configuración calculadora -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">1. Selecciona o escribe un escenario:</label>
+                            <select id="calcScenario" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                                <option value="365">Días del año (Cumpleaños) [365 categorías]</option>
+                                <option value="1000">Número de boleto de lotería local [1,000 categorías]</option>
+                                <option value="100">Días de vacaciones escolares [100 categorías]</option>
+                                <option value="30">Días en un mes [30 categorías]</option>
+                                <option value="custom">Otro escenario (Personalizado)</option>
+                            </select>
+                        </div>
+
+                        <div id="customCategoriesWrapper" class="hidden transition-all duration-300">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Cantidad de opciones o categorías ($c$):</label>
+                            <input type="number" id="calcCustomVal" min="2" max="1000000" value="500"
+                                   class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">2. Deseo calcular para un porcentaje de éxito de:</label>
+                            <div class="flex gap-2">
+                                <button type="button" class="btnPercent flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white" data-val="50">50% (Típico)</button>
+                                <button type="button" class="btnPercent flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-slate-200 text-slate-700 hover:bg-slate-300" data-val="95">95% (Casi Seguro)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resultado de la calculadora -->
+                    <div class="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm text-center flex flex-col justify-center items-center h-full min-h-[220px]">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-2">Se necesitan aproximadamente</span>
+                        <div class="flex items-baseline justify-center gap-1">
+                            <span id="calcResultValue" class="text-5xl md:text-6xl font-black text-blue-600 tracking-tight">23</span>
+                            <span class="text-lg font-bold text-slate-400">personas</span>
+                        </div>
+                        <span class="text-xs text-slate-500 mt-4 leading-relaxed max-w-[280px]">
+                            Para asegurar que al menos dos compartan la categoría elegida con la probabilidad deseada.
+                        </span>
+                        <div class="mt-4 pt-4 border-t border-slate-100 w-full text-[10px] font-mono text-slate-400">
+                            Fórmula aplicada: <span id="formulaUsed">N ≈ 1.2 * √365</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="percepcion" class="py-16 bg-[#fafafa] border-t border-b border-slate-100 scroll-mt-12">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <span class="text-xs font-extrabold text-blue-600 tracking-widest uppercase block mb-2">Experimento de Percepción</span>
+                <h2 class="text-3xl font-extrabold text-slate-900">La "Magia" de la Palabra Nueva</h2>
+                <p class="text-slate-500 mt-2">
+                    A menudo te parece que una palabra inusual que acabas de aprender empieza a aparecer por todas partes. Experimenta este fenómeno en tiempo real.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+                <!-- Tarjeta 1: Estímulo -->
+                <div class="bg-white p-6 border border-slate-100 rounded-2xl shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800 mb-2">Paso 1: Sensibiliza tu cerebro</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed mb-4">
+                            Abajo hay una palabra de origen poco común y muy rara en español. Haz clic en el botón para "aprender" su significado y guardarla en tu radar cognitivo.
+                        </p>
+                    </div>
+                    
+                    <div class="my-6 p-4 bg-slate-50 rounded-xl border border-slate-100 text-center">
+                        <span id="targetWord" class="text-3xl font-black text-slate-800 tracking-wide block mb-1">Acoquinamiento</span>
+                        <span id="targetMeaning" class="text-xs text-slate-500 italic">Haz clic para descubrir qué significa</span>
+                    </div>
+
+                    <button id="btnLearnWord" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-sm transition-all">
+                        <i class="fa-regular fa-eye mr-1"></i> Revelar Palabra y Significado
+                    </button>
+                </div>
+
+                <!-- Tarjeta 2: Lectura rápida -->
+                <div class="bg-white p-6 border border-slate-100 rounded-2xl shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800 mb-2">Paso 2: Simular tu día</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed mb-4">
+                            Simulamos la lectura de un bloque de noticias cotidiano tras el aprendizaje. ¿Lograrás ver la coincidencia de forma inmediata?
+                        </p>
+                    </div>
+
+                    <div id="newsFeed" class="my-4 bg-slate-50 rounded-xl p-4 text-xs text-slate-500 h-32 overflow-y-auto space-y-3 font-serif relative">
+                        <div class="text-center py-6 text-slate-400 italic">Aprende la palabra en el paso 1 para empezar a leer el flujo...</div>
+                        <!-- Bloques dinámicos de noticias -->
+                    </div>
+
+                    <button id="btnReadNews" disabled class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-xl text-sm transition-all">
+                        <i class="fa-solid fa-newspaper mr-1"></i> Simular Lectura Diaria
+                    </button>
+                </div>
+            </div>
+
+            <!-- Banner Alerta de Coincidencia (Reemplazo moderno de alert()) -->
+            <div id="customToast" class="hidden fixed bottom-6 right-6 z-50 max-w-sm bg-slate-900 text-white rounded-2xl shadow-2xl p-4 border border-slate-800 animate-bounce">
+                <div class="flex items-start gap-3">
+                    <span class="bg-emerald-500/20 text-emerald-400 w-8 h-8 rounded-lg flex items-center justify-center font-bold shrink-0">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </span>
+                    <div>
+                        <h4 class="font-bold text-sm text-white">¡Coincidencia Detectada!</h4>
+                        <p class="text-xs text-slate-400 mt-1" id="toastMessage">Acabas de encontrar tu palabra recién aprendida.</p>
+                        <button onclick="hideToast()" class="text-[10px] text-blue-400 hover:underline font-bold mt-2 inline-block">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-white">
+        <div class="max-w-3xl mx-auto px-4 prose prose-slate text-slate-700 leading-relaxed font-serif text-lg md:text-xl space-y-6">
+            <h2 class="font-sans font-extrabold text-2xl md:text-3xl text-slate-900 tracking-tight">Hacia una comprensión empática de la vida</h2>
+            <p>
+                La próxima vez que un acontecimiento te deje perplejo por su extraordinaria "casualidad", recuerda que no estás solo en tu asombro. Experimentamos el mundo bajo un sesgo de asombro totalmente natural. 
+            </p>
+            <p>
+                Como nos recuerdan en <span class="font-sans font-semibold text-blue-600 underline cursor-help decoration-dotted" title="Ensayo científico base de Diaconis y Mosteller">"Métodos Estadísticos para el estudio de las coincidencias"</span>, la vida genera estas interacciones chuscas por puro efecto de repetición. No dependemos del destino místico; al contrario, es el asombroso lienzo del azar el que, a pinceladas, pinta estas hermosas casualidades que nos hacen sentir que el universo es, por un segundo, un lugar un poco más conectado y cercano.
+            </p>
+        </div>
+    </section>
+
+    <footer id="referencias" class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 scroll-mt-12">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="border-b border-slate-800 pb-8 mb-8">
+                <h3 class="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-blue-500"></i> Referencia Académica (Estilo APA 7)
+                </h3>
+                <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 text-xs md:text-sm font-mono text-slate-300 leading-relaxed">
+                    <p>
+                        Diaconis, P., & Mosteller, F. (1989). Methods for Studying Coincidences. <span class="italic text-white">Journal of the American Statistical Association</span>, <span class="font-bold text-white">84</span>(408), 853–861. 
+                        <a href="http://dx.doi.org/10.1080/01621459.1989.10478847" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline block mt-2">
+                            <i class="fa-solid fa-link"></i> http://dx.doi.org/10.1080/01621459.1989.10478847
+                        </a>
+                    </p>
+                    <p class="mt-3 text-slate-400 italic">
+                        Nota: Este artículo web toma como referencia principal el documento científico traducido y adaptado bajo el nombre <span class="font-semibold text-slate-300">"Métodos Estadísticos para el estudio de las coincidencias"</span>.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs space-y-4 md:space-y-0">
+                <p>&copy; 2026 Asistente Editor. Desarrollado con rigurosidad estadística y pedagógica.</p>
+                <div class="flex space-x-6">
+                    <a href="#articulo" class="hover:text-white transition-colors">Volver al artículo</a>
+                    <a href="#simulador" class="hover:text-white transition-colors">Ejecutar simulaciones</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- 1. LÓGICA DE LA PARADOJA DE LOS CUMPLEAÑOS ---
+        const groupSizeInput = document.getElementById('groupSize');
+        const groupSizeValLabel = document.getElementById('groupSizeValue');
+        const theoreticalLabel = document.getElementById('theoreticalProb');
+        
+        const btnRunSim = document.getElementById('btnRunSim');
+        const btnResetSim = document.getElementById('btnResetSim');
+        
+        const statTotal = document.getElementById('statTotal');
+        const statMatches = document.getElementById('statMatches');
+        const statRate = document.getElementById('statRate');
+        
+        let simCountTotal = 0;
+        let simCountMatches = 0;
+        let probabilityChart = null;
+
+        // Fórmula de probabilidad teórica del cumpleaños
+        function calculateTheoreticalProbability(n) {
+            if (n > 365) return 100;
+            let probNoMatch = 1;
+            for (let i = 0; i < n; i++) {
+                probNoMatch *= (365 - i) / 365;
+            }
+            return (1 - probNoMatch) * 100;
+        }
+
+        // Simular un grupo aleatorio
+        function hasBirthdayCollision(n) {
+            const birthdays = new Set();
+            for (let i = 0; i < n; i++) {
+                const day = Math.floor(Math.random() * 365);
+                if (birthdays.has(day)) {
+                    return true;
+                }
+                birthdays.add(day);
+            }
+            return false;
+        }
+
+        // Ejecutar simulación
+        function runSimulations(n, iterations = 1000) {
+            let matches = 0;
+            for (let i = 0; i < iterations; i++) {
+                if (hasBirthdayCollision(n)) {
+                    matches++;
+                }
+            }
+            simCountTotal += iterations;
+            simCountMatches += matches;
+            
+            // Actualizar interfaz
+            statTotal.textContent = simCountTotal.toLocaleString();
+            statMatches.textContent = simCountMatches.toLocaleString();
+            const rate = (simCountMatches / simCountTotal) * 100;
+            statRate.textContent = rate.toFixed(2) + '%';
+        }
+
+        // Inicializar gráfico
+        function initChart() {
+            const ctx = document.getElementById('probabilityChart').getContext('2d');
+            const dataPoints = [];
+            const labels = [];
+            for (let i = 2; i <= 80; i += 2) {
+                labels.push(i);
+                dataPoints.push(calculateTheoreticalProbability(i));
+            }
+
+            probabilityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Probabilidad Teórica (%)',
+                        data: dataPoints,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 1,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100,
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Actualizar punto actual en el gráfico
+        function updateChartPoint(n) {
+            if (!probabilityChart) return;
+            // Quitamos marcas previas
+            probabilityChart.data.datasets = [probabilityChart.data.datasets[0]];
+            
+            // Insertar punto actual
+            const theoreticalY = calculateTheoreticalProbability(n);
+            
+            probabilityChart.update();
+        }
+
+        // Listeners cumpleaños
+        groupSizeInput.addEventListener('input', (e) => {
+            const n = parseInt(e.target.value);
+            groupSizeValLabel.textContent = n;
+            const tProb = calculateTheoreticalProbability(n);
+            theoreticalLabel.textContent = tProb.toFixed(1) + '%';
+        });
+
+        btnRunSim.addEventListener('click', () => {
+            const n = parseInt(groupSizeInput.value);
+            runSimulations(n, 1000);
+        });
+
+        btnResetSim.addEventListener('click', () => {
+            simCountTotal = 0;
+            simCountMatches = 0;
+            statTotal.textContent = '0';
+            statMatches.textContent = '0';
+            statRate.textContent = '0.00%';
+        });
+
+
+        // --- 2. LÓGICA DE CALCULADORA GENERAL ---
+        const calcScenario = document.getElementById('calcScenario');
+        const customCategoriesWrapper = document.getElementById('customCategoriesWrapper');
+        const calcCustomVal = document.getElementById('calcCustomVal');
+        const calcResultValue = document.getElementById('calcResultValue');
+        const formulaUsed = document.getElementById('formulaUsed');
+        let chosenPercent = 50; // default
+
+        const btnPercents = document.querySelectorAll('.btnPercent');
+        btnPercents.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                btnPercents.forEach(b => {
+                    b.classList.remove('bg-blue-600', 'text-white');
+                    b.classList.add('bg-slate-200', 'text-slate-700');
+                });
+                btn.classList.add('bg-blue-600', 'text-white');
+                btn.classList.remove('bg-slate-200', 'text-slate-700');
+                chosenPercent = parseInt(btn.dataset.val);
+                recalculateAzar();
+            });
+        });
+
+        calcScenario.addEventListener('change', () => {
+            if (calcScenario.value === 'custom') {
+                customCategoriesWrapper.classList.remove('hidden');
+            } else {
+                customCategoriesWrapper.classList.add('hidden');
+            }
+            recalculateAzar();
+        });
+
+        calcCustomVal.addEventListener('input', recalculateAzar);
+
+        function recalculateAzar() {
+            let c = 365;
+            if (calcScenario.value === 'custom') {
+                c = parseInt(calcCustomVal.value) || 2;
+            } else {
+                c = parseInt(calcScenario.value);
+            }
+
+            // Fórmula: N = k * sqrt(c)
+            // Para 50% de probabilidad: k ≈ 1.2
+            // Para 95% de probabilidad: k ≈ 2.5
+            const k = (chosenPercent === 50) ? 1.2 : 2.5;
+            const result = Math.ceil(k * Math.sqrt(c));
+
+            calcResultValue.textContent = result.toLocaleString();
+            formulaUsed.textContent = `N ≈ ${k} * √${c.toLocaleString()}`;
+        }
+
+
+        // --- 3. EXPERIMENTO DE PERCEPCIÓN ("PALABRA NUEVA") ---
+        const btnLearnWord = document.getElementById('btnLearnWord');
+        const btnReadNews = document.getElementById('btnReadNews');
+        const targetMeaning = document.getElementById('targetMeaning');
+        const newsFeed = document.getElementById('newsFeed');
+        
+        let wordLearned = false;
+        
+        const dbWords = [
+            { word: "Acoquinamiento", meaning: "Dícese del estado de desánimo, cobardía o apocamiento profundo." },
+            { word: "Sesquipedálico", meaning: "Aquello que tiene un pie y medio de dimensión, o que es excesivamente largo." },
+            { word: "Zaragüelles", meaning: "Calzones anchos y folgados tradicionales de las tierras de Valencia y Murcia." }
+        ];
+
+        // Seleccionar una palabra aleatoria
+        const chosenWordObj = dbWords[Math.floor(Math.random() * dbWords.length)];
+        document.getElementById('targetWord').textContent = chosenWordObj.word;
+
+        btnLearnWord.addEventListener('click', () => {
+            targetMeaning.textContent = `Significado: ${chosenWordObj.meaning}`;
+            targetMeaning.classList.add('text-slate-800', 'font-medium', 'not-italic');
+            targetMeaning.classList.remove('text-slate-500');
+            wordLearned = true;
+            btnReadNews.removeAttribute('disabled');
+            
+            // Limpiamos flujo para iniciar de nuevo
+            newsFeed.innerHTML = '<div class="text-xs text-blue-600 animate-pulse text-center py-4 font-sans"><i class="fa-solid fa-satellite-dish mr-1"></i> Buscando publicaciones diarias...</div>';
+        });
+
+        const headlines = [
+            "El Banco Central decide mantener los tipos de interés tras los informes de inflación de este trimestre.",
+            "Nuevas tecnologías de filtrado de datos optimizan el consumo energético en servidores de alto rendimiento.",
+            "Un grupo de arqueólogos localiza restos cerámicos medievales a las afueras de la urbe histórica.",
+            "La federación de atletismo descarta la aplicación de medidas punitivas y opta por la mediación.",
+            "El clima otoñal se retrasa con temperaturas inusualmente altas para estas fechas del año."
+        ];
+
+        btnReadNews.addEventListener('click', () => {
+            if (!wordLearned) return;
+
+            // Limpiamos y generamos feed
+            newsFeed.innerHTML = "";
+            let randomTimes = 3; 
+            
+            // Generamos noticias cotidianas normales
+            for (let i = 0; i < randomTimes; i++) {
+                const text = headlines[Math.floor(Math.random() * headlines.length)];
+                addHeadline(text);
+            }
+
+            // Forzamos la "coincidencia" que simula nuestro día a día
+            const customHeadline = `En la columna de análisis literario, se debatió sobre el <strong>${chosenWordObj.word.toLowerCase()}</strong> de la prosa contemporánea frente a las vanguardias.`;
+            
+            setTimeout(() => {
+                addHeadline(customHeadline, true);
+                showToast(`¡Acabas de encontrar la palabra "${chosenWordObj.word}" en el feed de noticias!`);
+            }, 600);
+        });
+
+        function addHeadline(html, highlight = false) {
+            const div = document.createElement('div');
+            div.className = `p-3 rounded-lg border text-xs leading-relaxed transition-all duration-300 ${highlight ? 'bg-blue-50 border-blue-200 text-blue-900 font-semibold' : 'bg-white border-slate-100 text-slate-600'}`;
+            div.innerHTML = html;
+            newsFeed.appendChild(div);
+            newsFeed.scrollTop = newsFeed.scrollHeight;
+        }
+
+        // Funciones del Custom Toast
+        function showToast(msg) {
+            const toast = document.getElementById('customToast');
+            document.getElementById('toastMessage').textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.remove('animate-bounce');
+            }, 2500);
+        }
+
+        function hideToast() {
+            document.getElementById('customToast').classList.add('hidden');
+        }
+
+
+        // --- CARGA INICIAL ---
+        window.onload = function () {
+            // Inicializar KaTeX
+            renderMathInElement(document.body);
+            // Iniciar Gráfico
+            initChart();
+            // Ejecutar la primera calculadora
+            recalculateAzar();
+        };
+    </script>
+</body>
+</html>

@@ -3,18 +3,3 @@ title: "Francisco Letelier"
 ---
 
 Sitio dedicado a visualizar proyectos personales.
-
-```{r}
-#| label: setup
-#| include: true
-
-
-a <- 1
-b <- 2
-
-c <- a + b
-
-print(c)
-
-
-```

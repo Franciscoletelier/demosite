@@ -1,7 +1,9 @@
 project:
   type: website
   output-dir: docs
-
+  resources:
+    - posts/*.html
+    
 website:
   title: "Francisco Letelier C"
   description: "Ciencia de datos, estadística y visualización"
@@ -10,17 +12,16 @@ website:
   open-graph: true
   twitter-card: true
   navbar:
-    background: dark
+    background: "#ffffff"
     pinned: true
+#    background: dark
     left:
-      - href: index.qmd
-        text: Home
-      - href: posts.qmd
-        text: Blog
-      - href: proyectos.qmd
-        text: Proyectos
-      - href: about.qmd
-        text: Sobre mí
+    - href: index.qmd
+      text: Home
+    - href: posts.qmd
+      text: Artículos
+    - href: about.qmd
+      text: Sobre mi
     right:
       - icon: github
         href: https://franciscoletelier.github.io
@@ -38,17 +39,16 @@ website:
 
 format:
   html:
-    theme:
-      light: cosmo
-      dark: darkly
+    theme: cosmo
     css: styles.css
     toc: true
-    toc-depth: 3
-    code-fold: true
-    code-tools: true
-    smooth-scroll: true
+    mainfont: "Inter"
     fontsize: 1.05em
-    linkcolor: "#7c3aed"
+    include-in-header:
+      - text: |
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 
 editor: visual
 

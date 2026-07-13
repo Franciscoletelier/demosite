@@ -1,0 +1,30 @@
+---
+title: "Artículos"
+subtitle: "Data science, estadística y probabilidad, explicados con datos y visualizaciones interactivas"
+page-layout: full
+toc: false
+---
+
+::: {.posts-grid}
+
+::: {.post-card}
+<span class="post-card-tag">Estadística &middot; Interactivo</span>
+
+### [¿Destino o Estadística?](posts/coincidencias.html)
+
+Los secretos de cómo la probabilidad explica las coincidencias más asombrosas de nuestras vidas — con simulador de la paradoja de los cumpleaños, calculadora de azar y un experimento de percepción en vivo.
+
+<span class="post-card-meta"><i class="fa-regular fa-clock"></i> 8 min &nbsp;&middot;&nbsp; <i class="fa-solid fa-flask"></i> Contenido interactivo</span>
+
+[Leer artículo &rarr;](posts/coincidencias.html){.post-card-link}
+:::
+
+::: {.post-card .post-card-placeholder}
+<span class="post-card-tag">Próximamente</span>
+
+### Nuevo artículo
+
+Aquí aparecerá tu próximo post. Duplica una tarjeta como la de arriba y cambia el título, la descripción y el enlace.
+:::
+
+:::

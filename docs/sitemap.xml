@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://franciscoletelier.github.io/demosite/posts.html</loc>
+    <lastmod>2026-07-13T02:40:01.734Z</lastmod>
+  </url>
+  <url>
     <loc>https://franciscoletelier.github.io/demosite/index.html</loc>
-    <lastmod>2026-07-07T03:31:28.122Z</lastmod>
+    <lastmod>2026-07-13T02:36:59.057Z</lastmod>
+  </url>
+  <url>
+    <loc>https://franciscoletelier.github.io/demosite/about.html</loc>
+    <lastmod>2026-07-13T02:26:23.665Z</lastmod>
   </url>
 </urlset>
