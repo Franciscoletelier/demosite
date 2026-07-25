@@ -106,6 +106,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../styles.css">
 <meta property="og:title" content="Ruteo semanal de una flota de barcos: los puertos de Chile – Francisco Letelier C">
@@ -177,8 +206,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#los-datos-puertos-y-flota" id="toc-los-datos-puertos-y-flota" class="nav-link" data-scroll-target="#los-datos-puertos-y-flota">Los datos: puertos y flota</a></li>
   <li><a href="#demanda-semanal-sintética" id="toc-demanda-semanal-sintética" class="nav-link" data-scroll-target="#demanda-semanal-sintética">Demanda semanal (sintética)</a></li>
   <li><a href="#matriz-de-distancias" id="toc-matriz-de-distancias" class="nav-link" data-scroll-target="#matriz-de-distancias">Matriz de distancias</a></li>
-  <li><a href="#el-modelo-de-optimización-con-or-tools" id="toc-el-modelo-de-optimización-con-or-tools" class="nav-link" data-scroll-target="#el-modelo-de-optimización-con-or-tools">El modelo de optimización con OR-Tools</a></li>
-  <li><a href="#resultados-las-rutas-de-la-semana" id="toc-resultados-las-rutas-de-la-semana" class="nav-link" data-scroll-target="#resultados-las-rutas-de-la-semana">Resultados: las rutas de la semana</a></li>
+  <li><a href="#costos-de-operación-por-tipo-de-barco" id="toc-costos-de-operación-por-tipo-de-barco" class="nav-link" data-scroll-target="#costos-de-operación-por-tipo-de-barco">Costos de operación por tipo de barco</a></li>
+  <li><a href="#el-modelo-de-optimización-con-or-tools" id="toc-el-modelo-de-optimización-con-or-tools" class="nav-link" data-scroll-target="#el-modelo-de-optimización-con-or-tools">El modelo de optimización con OR-Tools</a>
+  <ul class="collapse">
+  <li><a href="#fase-1-minimizar-el-costo-total-de-la-flota" id="toc-fase-1-minimizar-el-costo-total-de-la-flota" class="nav-link" data-scroll-target="#fase-1-minimizar-el-costo-total-de-la-flota">Fase 1: minimizar el costo total de la flota</a></li>
+  </ul></li>
+  <li><a href="#restricción-tope-máximo-de-distancia-por-ruta" id="toc-restricción-tope-máximo-de-distancia-por-ruta" class="nav-link" data-scroll-target="#restricción-tope-máximo-de-distancia-por-ruta">Restricción: tope máximo de distancia por ruta</a></li>
+  <li><a href="#el-coeficiente-de-span-global-qué-es-y-por-qué-importa" id="toc-el-coeficiente-de-span-global-qué-es-y-por-qué-importa" class="nav-link" data-scroll-target="#el-coeficiente-de-span-global-qué-es-y-por-qué-importa">El Coeficiente de Span Global: qué es y por qué importa</a>
+  <ul class="collapse">
+  <li><a href="#un-detalle-que-hay-que-entender-antes-de-usarlo-los-barcos-ociosos-cuentan" id="toc-un-detalle-que-hay-que-entender-antes-de-usarlo-los-barcos-ociosos-cuentan" class="nav-link" data-scroll-target="#un-detalle-que-hay-que-entender-antes-de-usarlo-los-barcos-ociosos-cuentan">Un detalle que hay que entender antes de usarlo: los barcos ociosos cuentan</a></li>
+  <li><a href="#modelo-final-costo-por-tipo-de-barco-tope-de-distancia-coeficiente-de-span-global" id="toc-modelo-final-costo-por-tipo-de-barco-tope-de-distancia-coeficiente-de-span-global" class="nav-link" data-scroll-target="#modelo-final-costo-por-tipo-de-barco-tope-de-distancia-coeficiente-de-span-global">Modelo final: costo por tipo de barco + tope de distancia + Coeficiente de Span Global</a></li>
+  </ul></li>
   <li><a href="#conclusiones-y-límites-del-ejemplo" id="toc-conclusiones-y-límites-del-ejemplo" class="nav-link" data-scroll-target="#conclusiones-y-límites-del-ejemplo">Conclusiones y límites del ejemplo</a></li>
   </ul>
 </nav>
@@ -252,7 +290,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="los-datos-puertos-y-flota" class="level2">
 <h2 class="anchored" data-anchor-id="los-datos-puertos-y-flota">Los datos: puertos y flota</h2>
 <p>Partimos de las coordenadas de los seis principales puertos de Chile:</p>
-<div id="7d1bc0a3" class="cell" data-execution_count="1">
+<div id="4ed96d8e" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Ver código</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -362,7 +400,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Usaremos el <strong>Puerto de Valparaíso</strong> como puerto base (<em>depot</em>): ahí parten y regresan todos los barcos cada semana.</p>
-<div id="312d17e3" class="cell" data-execution_count="2">
+<div id="f111a812" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Ver código</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>flota <span class="op">=</span> pd.DataFrame({</span>
@@ -415,7 +453,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="4426ca44" class="cell" data-execution_count="3">
+<div id="3896f16e" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Ver código</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
@@ -444,9 +482,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell-output cell-output-display">
 <div style="height:550px; width:100%;">            <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG"></script><script>if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}</script>                <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
-        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.7.0.min.js" integrity="sha256-jvTGqxNp8AGWEcvNLVuKr+8j5dGe9Yw51LQkmDH+IYA=" crossorigin="anonymous"></script>                <div id="1b6318b3-1122-4d33-8307-813726c76d38" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("1b6318b3-1122-4d33-8307-813726c76d38")) {                    Plotly.newPlot(                        "1b6318b3-1122-4d33-8307-813726c76d38",                        [{"geo":"geo","hovertemplate":"Rol=Puerto de destino\u003cbr\u003ePuerto=%{text}\u003cbr\u003eLatitud=%{lat}\u003cbr\u003eLongitud=%{lon}\u003cextra\u003e\u003c\u002fextra\u003e","lat":{"dtype":"f8","bdata":"IH9pUZ80NMAL1GLwMKU3wNemsb0WzEDAzczMzMxcQsAzMzMzM4NCwA=="},"legendgroup":"Puerto de destino","lon":{"dtype":"f8","bdata":"jubIyi+KUcB2pztPPJtRwMTRVbq751HAPC6qRURIUsAqOLwgIkpSwA=="},"marker":{"color":"#1f77b4","symbol":"circle","size":11},"mode":"markers+text","name":"Puerto de destino","showlegend":true,"text":["Puerto de Iquique","Puerto de Antofagasta","Puerto de San Antonio","Puerto de San Vicente","Puerto Coronel"],"type":"scattergeo","textposition":"middle right"},{"geo":"geo","hovertemplate":"Rol=Puerto base (depot)\u003cbr\u003ePuerto=%{text}\u003cbr\u003eLatitud=%{lat}\u003cbr\u003eLongitud=%{lon}\u003cextra\u003e\u003c\u002fextra\u003e","lat":{"dtype":"f8","bdata":"KxTpfk6DQMA="},"legendgroup":"Puerto base (depot)","lon":{"dtype":"f8","bdata":"5ueGpuzoUcA="},"marker":{"color":"#d62728","symbol":"circle","size":11},"mode":"markers+text","name":"Puerto base (depot)","showlegend":true,"text":["Puerto de Valpara\u00edso"],"type":"scattergeo","textposition":"middle right"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"},"margin":{"b":0,"l":0,"r":0,"t":30}}},"geo":{"domain":{"x":[0.0,1.0],"y":[0.0,1.0]},"center":{},"scope":"south america","fitbounds":"locations","showland":true,"landcolor":"rgb(235,235,235)","showcountries":true},"legend":{"title":{"text":"Rol"},"tracegroupgap":0},"title":{"text":"Puertos principales de Chile considerados en el ejemplo"},"margin":{"l":0,"r":0,"t":50,"b":0},"height":550},                        {"responsive": true}                    ).then(function(){
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.7.0.min.js" integrity="sha256-jvTGqxNp8AGWEcvNLVuKr+8j5dGe9Yw51LQkmDH+IYA=" crossorigin="anonymous"></script>                <div id="8fc6d392-d938-4251-8883-d7f7c781e9e2" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("8fc6d392-d938-4251-8883-d7f7c781e9e2")) {                    Plotly.newPlot(                        "8fc6d392-d938-4251-8883-d7f7c781e9e2",                        [{"geo":"geo","hovertemplate":"Rol=Puerto de destino\u003cbr\u003ePuerto=%{text}\u003cbr\u003eLatitud=%{lat}\u003cbr\u003eLongitud=%{lon}\u003cextra\u003e\u003c\u002fextra\u003e","lat":{"dtype":"f8","bdata":"IH9pUZ80NMAL1GLwMKU3wNemsb0WzEDAzczMzMxcQsAzMzMzM4NCwA=="},"legendgroup":"Puerto de destino","lon":{"dtype":"f8","bdata":"jubIyi+KUcB2pztPPJtRwMTRVbq751HAPC6qRURIUsAqOLwgIkpSwA=="},"marker":{"color":"#1f77b4","symbol":"circle","size":11},"mode":"markers+text","name":"Puerto de destino","showlegend":true,"text":["Puerto de Iquique","Puerto de Antofagasta","Puerto de San Antonio","Puerto de San Vicente","Puerto Coronel"],"type":"scattergeo","textposition":"middle right"},{"geo":"geo","hovertemplate":"Rol=Puerto base (depot)\u003cbr\u003ePuerto=%{text}\u003cbr\u003eLatitud=%{lat}\u003cbr\u003eLongitud=%{lon}\u003cextra\u003e\u003c\u002fextra\u003e","lat":{"dtype":"f8","bdata":"KxTpfk6DQMA="},"legendgroup":"Puerto base (depot)","lon":{"dtype":"f8","bdata":"5ueGpuzoUcA="},"marker":{"color":"#d62728","symbol":"circle","size":11},"mode":"markers+text","name":"Puerto base (depot)","showlegend":true,"text":["Puerto de Valpara\u00edso"],"type":"scattergeo","textposition":"middle right"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"},"margin":{"b":0,"l":0,"r":0,"t":30}}},"geo":{"domain":{"x":[0.0,1.0],"y":[0.0,1.0]},"center":{},"scope":"south america","fitbounds":"locations","showland":true,"landcolor":"rgb(235,235,235)","showcountries":true},"legend":{"title":{"text":"Rol"},"tracegroupgap":0},"title":{"text":"Puertos principales de Chile considerados en el ejemplo"},"margin":{"l":0,"r":0,"t":50,"b":0},"height":550},                        {"responsive": true}                    ).then(function(){
                             
-var gd = document.getElementById('1b6318b3-1122-4d33-8307-813726c76d38');
+var gd = document.getElementById('8fc6d392-d938-4251-8883-d7f7c781e9e2');
 var x = new MutationObserver(function (mutations, observer) {{
         var display = window.getComputedStyle(gd).display;
         if (!display || display === 'none') {{
@@ -475,7 +513,7 @@ if (outputEl) {{
 <section id="demanda-semanal-sintética" class="level2">
 <h2 class="anchored" data-anchor-id="demanda-semanal-sintética">Demanda semanal (sintética)</h2>
 <p>No tenemos datos reales de toneladas a transportar por puerto, así que generamos una <strong>demanda sintética</strong> con una semilla fija (para que el ejemplo sea reproducible). Acotamos la demanda de cada puerto entre 15 y 70 toneladas — siempre por debajo de la capacidad máxima de un barco tipo C (90 ton) — para que cada puerto pueda ser abastecido por un solo barco, sin necesidad de dividir la entrega.</p>
-<div id="e3e3d630" class="cell" data-execution_count="4">
+<div id="ac79d62d" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Ver código</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(seed<span class="op">=</span><span class="dv">42</span>)</span>
@@ -535,7 +573,7 @@ if (outputEl) {{
 </div>
 </div>
 </div>
-<div id="b85bd450" class="cell" data-execution_count="5">
+<div id="036c9afb" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Ver código</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>capacidad_total <span class="op">=</span> <span class="bu">int</span>(flota[<span class="st">"Capacidad_total_ton"</span>].<span class="bu">sum</span>())</span>
@@ -555,7 +593,7 @@ La flota completa nunca es necesaria: sobra capacidad de sobra incluso usando po
 <section id="matriz-de-distancias" class="level2">
 <h2 class="anchored" data-anchor-id="matriz-de-distancias">Matriz de distancias</h2>
 <p>Como solo contamos con las coordenadas de los puertos (no rutas de navegación reales), aproximamos la distancia entre cada par de puertos con la <strong>fórmula de Haversine</strong>, que calcula la distancia en línea recta sobre la superficie de la Tierra a partir de latitud y longitud. Es una simplificación razonable para un ejemplo didáctico: en la práctica, un barco real seguiría corredores de navegación y no una línea recta.</p>
-<div id="71d0fec8" class="cell" data-execution_count="6">
+<div id="95ace84a" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Ver código</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> haversine(lat1, lon1, lat2, lon2):</span>
@@ -675,112 +713,205 @@ La flota completa nunca es necesaria: sobra capacidad de sobra incluso usando po
 </div>
 </div>
 </section>
+<section id="costos-de-operación-por-tipo-de-barco" class="level2">
+<h2 class="anchored" data-anchor-id="costos-de-operación-por-tipo-de-barco">Costos de operación por tipo de barco</h2>
+<p>Hasta aquí el modelo trataría un kilómetro recorrido por cualquier barco como igual de “caro”. En la práctica no es así: un barco tipo C (90 ton) cuesta mucho más operar por kilómetro que uno tipo A (25 ton) — más tripulación, más combustible, más mantención. Incorporamos un costo de operación distinto por tipo de barco (en pesos chilenos, CLP, por kilómetro) y <strong>cambiamos el objetivo del modelo: en vez de minimizar distancia, minimizamos el costo total de la semana</strong>.</p>
+<div id="92aad3f9" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>costo_por_km <span class="op">=</span> {<span class="dv">25</span>: <span class="dv">1_000_000</span>, <span class="dv">60</span>: <span class="dv">3_000_000</span>, <span class="dv">90</span>: <span class="dv">5_000_000</span>}  <span class="co"># CLP por km, según capacidad/tipo de barco</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>costos_tabla <span class="op">=</span> flota.copy()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>costos_tabla[<span class="st">"Costo_por_km_CLP"</span>] <span class="op">=</span> costos_tabla[<span class="st">"Capacidad_ton"</span>].<span class="bu">map</span>(costo_por_km)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>costos_tabla</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Tipo</th>
+<th data-quarto-table-cell-role="th">Capacidad_ton</th>
+<th data-quarto-table-cell-role="th">Cantidad_barcos</th>
+<th data-quarto-table-cell-role="th">Capacidad_total_ton</th>
+<th data-quarto-table-cell-role="th">Costo_por_km_CLP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>A</td>
+<td>25</td>
+<td>9</td>
+<td>225</td>
+<td>1000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>B</td>
+<td>60</td>
+<td>6</td>
+<td>360</td>
+<td>3000000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>C</td>
+<td>90</td>
+<td>5</td>
+<td>450</td>
+<td>5000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
 <section id="el-modelo-de-optimización-con-or-tools" class="level2">
 <h2 class="anchored" data-anchor-id="el-modelo-de-optimización-con-or-tools">El modelo de optimización con OR-Tools</h2>
-<p>Con los datos listos, construimos el modelo de ruteo:</p>
+<p>Reconstruimos el modelo de ruteo con estas piezas:</p>
 <ul>
 <li><strong>Nodos:</strong> el depot (Valparaíso) más los 5 puertos con demanda.</li>
 <li><strong>Vehículos:</strong> 20 barcos, cada uno con su capacidad según su tipo (<code>vehicle_capacities</code>).</li>
 <li><strong>Demanda:</strong> las toneladas que hay que dejar en cada puerto (<code>demands</code>).</li>
-<li><strong>Costo de cada arco:</strong> la distancia Haversine entre nodos — el solver minimiza la suma de estos costos.</li>
-<li><strong>Restricción de capacidad:</strong> la carga acumulada en la ruta de un barco nunca puede superar su capacidad, usando <code>AddDimensionWithVehicleCapacity</code>.</li>
+<li><strong>Costo de cada arco:</strong> ahora depende de <strong>qué barco</strong> lo recorre, no solo de la distancia — cada tipo de barco tiene su propio costo por km (<code>SetArcCostEvaluatorOfVehicle</code>, uno por barco, en vez de un único evaluador compartido).</li>
+<li><strong>Restricción de capacidad:</strong> la carga acumulada en la ruta de un barco nunca puede superar su capacidad (<code>AddDimensionWithVehicleCapacity</code>).</li>
+<li><strong>Dimensión de distancia:</strong> además del costo, hacemos seguimiento de la distancia acumulada de cada ruta (<code>AddDimension</code>) — la usaremos más abajo para el tope máximo por ruta y el Coeficiente de Span Global.</li>
 </ul>
-<p>OR-Tools trabaja con números enteros, así que escalamos las distancias de kilómetros a metros antes de pasarlas al solver.</p>
-<div id="f49c0708" class="cell" data-execution_count="7">
+<p>Empaquetamos la construcción y la extracción de resultados en dos funciones, porque las vamos a reutilizar varias veces con distintas configuraciones a lo largo del post.</p>
+<div id="539ee415" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Ver código</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ortools.constraint_solver <span class="im">import</span> routing_enums_pb2</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ortools.constraint_solver <span class="im">import</span> pywrapcp</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>capacidades_barcos <span class="op">=</span> [<span class="dv">25</span>] <span class="op">*</span> <span class="dv">9</span> <span class="op">+</span> [<span class="dv">60</span>] <span class="op">*</span> <span class="dv">6</span> <span class="op">+</span> [<span class="dv">90</span>] <span class="op">*</span> <span class="dv">5</span>  <span class="co"># 20 barcos: 9 tipo A, 6 tipo B, 5 tipo C</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>num_vehiculos <span class="op">=</span> <span class="bu">len</span>(capacidades_barcos)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>depot_index <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>dist_matrix_m <span class="op">=</span> (dist_matrix <span class="op">*</span> <span class="dv">1000</span>).astype(<span class="bu">int</span>)  <span class="co"># metros, para no perder precisión al truncar a enteros</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>demandas <span class="op">=</span> [<span class="bu">int</span>(d) <span class="cf">for</span> d <span class="kw">in</span> nodos[<span class="st">"Demanda_ton"</span>]]</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>manager <span class="op">=</span> pywrapcp.RoutingIndexManager(n_nodos, num_vehiculos, depot_index)</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>routing <span class="op">=</span> pywrapcp.RoutingModel(manager)</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> distancia_callback(from_index, to_index):</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    from_node <span class="op">=</span> manager.IndexToNode(from_index)</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    to_node <span class="op">=</span> manager.IndexToNode(to_index)</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">int</span>(dist_matrix_m[from_node][to_node])</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>transit_callback_index <span class="op">=</span> routing.RegisterTransitCallback(distancia_callback)</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>routing.SetArcCostEvaluatorOfAllVehicles(transit_callback_index)</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> demanda_callback(from_index):</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    from_node <span class="op">=</span> manager.IndexToNode(from_index)</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> demandas[from_node]</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>demand_callback_index <span class="op">=</span> routing.RegisterUnaryTransitCallback(demanda_callback)</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>routing.AddDimensionWithVehicleCapacity(</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    demand_callback_index,</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>,  <span class="co"># sin holgura</span></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    capacidades_barcos,</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    <span class="va">True</span>,  <span class="co"># el acumulado de carga parte en cero en el depot</span></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Capacidad"</span></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>search_parameters <span class="op">=</span> pywrapcp.DefaultRoutingSearchParameters()</span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>search_parameters.first_solution_strategy <span class="op">=</span> routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC</span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>search_parameters.local_search_metaheuristic <span class="op">=</span> routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH</span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>search_parameters.time_limit.FromSeconds(<span class="dv">5</span>)</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>solution <span class="op">=</span> routing.SolveWithParameters(search_parameters)</span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Solución encontrada"</span> <span class="cf">if</span> solution <span class="cf">else</span> <span class="st">"No se encontró solución factible"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.graph_objects <span class="im">as</span> go</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ortools.constraint_solver <span class="im">import</span> routing_enums_pb2</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ortools.constraint_solver <span class="im">import</span> pywrapcp</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>capacidades_barcos <span class="op">=</span> [<span class="dv">25</span>] <span class="op">*</span> <span class="dv">9</span> <span class="op">+</span> [<span class="dv">60</span>] <span class="op">*</span> <span class="dv">6</span> <span class="op">+</span> [<span class="dv">90</span>] <span class="op">*</span> <span class="dv">5</span>  <span class="co"># 20 barcos: 9 tipo A, 6 tipo B, 5 tipo C</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>num_vehiculos <span class="op">=</span> <span class="bu">len</span>(capacidades_barcos)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>depot_index <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>dist_matrix_m <span class="op">=</span> (dist_matrix <span class="op">*</span> <span class="dv">1000</span>).astype(<span class="bu">int</span>)  <span class="co"># metros, para no perder precisión al truncar a enteros</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>demandas <span class="op">=</span> [<span class="bu">int</span>(d) <span class="cf">for</span> d <span class="kw">in</span> nodos[<span class="st">"Demanda_ton"</span>]]</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> construir_modelo(usar_costo_por_tipo<span class="op">=</span><span class="va">True</span>, tope_distancia_km<span class="op">=</span><span class="va">None</span>, coeficiente_span<span class="op">=</span><span class="va">None</span>, tiempo_limite_s<span class="op">=</span><span class="dv">5</span>):</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    manager <span class="op">=</span> pywrapcp.RoutingIndexManager(n_nodos, num_vehiculos, depot_index)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    routing <span class="op">=</span> pywrapcp.RoutingModel(manager)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> distancia_callback(from_index, to_index):</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        from_node <span class="op">=</span> manager.IndexToNode(from_index)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        to_node <span class="op">=</span> manager.IndexToNode(to_index)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">int</span>(dist_matrix_m[from_node][to_node])</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    distancia_callback_index <span class="op">=</span> routing.RegisterTransitCallback(distancia_callback)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> usar_costo_por_tipo:</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># un evaluador de costo distinto por barco: mismo km, distinto precio según el tipo</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> vehicle_id <span class="kw">in</span> <span class="bu">range</span>(num_vehiculos):</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>            costo_km <span class="op">=</span> costo_por_km[capacidades_barcos[vehicle_id]]</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>            <span class="kw">def</span> costo_callback(from_index, to_index, costo_km<span class="op">=</span>costo_km):</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>                from_node <span class="op">=</span> manager.IndexToNode(from_index)</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>                to_node <span class="op">=</span> manager.IndexToNode(to_index)</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="bu">int</span>(<span class="bu">round</span>(dist_matrix[from_node][to_node] <span class="op">*</span> costo_km))</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>            costo_callback_index <span class="op">=</span> routing.RegisterTransitCallback(costo_callback)</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>            routing.SetArcCostEvaluatorOfVehicle(costo_callback_index, vehicle_id)</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>        routing.SetArcCostEvaluatorOfAllVehicles(distancia_callback_index)</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> demanda_callback(from_index):</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> demandas[manager.IndexToNode(from_index)]</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    demand_callback_index <span class="op">=</span> routing.RegisterUnaryTransitCallback(demanda_callback)</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    routing.AddDimensionWithVehicleCapacity(demand_callback_index, <span class="dv">0</span>, capacidades_barcos, <span class="va">True</span>, <span class="st">"Capacidad"</span>)</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    tope_m <span class="op">=</span> <span class="bu">int</span>(tope_distancia_km <span class="op">*</span> <span class="dv">1000</span>) <span class="cf">if</span> tope_distancia_km <span class="cf">else</span> <span class="dv">10_000_000</span>  <span class="co"># sin tope real si no se especifica</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    routing.AddDimension(distancia_callback_index, <span class="dv">0</span>, tope_m, <span class="va">True</span>, <span class="st">"Distancia"</span>)</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> coeficiente_span:</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>        routing.GetDimensionOrDie(<span class="st">"Distancia"</span>).SetGlobalSpanCostCoefficient(coeficiente_span)</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    search_parameters <span class="op">=</span> pywrapcp.DefaultRoutingSearchParameters()</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>    search_parameters.first_solution_strategy <span class="op">=</span> routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>    search_parameters.local_search_metaheuristic <span class="op">=</span> routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    search_parameters.time_limit.FromSeconds(tiempo_limite_s)</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    solution <span class="op">=</span> routing.SolveWithParameters(search_parameters)</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> manager, routing, solution</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extraer_rutas(manager, routing, solution):</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>    columnas <span class="op">=</span> [<span class="st">"Barco"</span>, <span class="st">"Tipo"</span>, <span class="st">"Capacidad_ton"</span>, <span class="st">"Carga_ton"</span>, <span class="st">"Distancia_km"</span>, <span class="st">"Costo_CLP"</span>, <span class="st">"Ruta"</span>]</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> solution <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pd.DataFrame(columns<span class="op">=</span>columnas), []</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>    rutas <span class="op">=</span> []</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> vehicle_id <span class="kw">in</span> <span class="bu">range</span>(num_vehiculos):</span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>        index <span class="op">=</span> routing.Start(vehicle_id)</span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>        secuencia, carga <span class="op">=</span> [], <span class="dv">0</span></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> <span class="kw">not</span> routing.IsEnd(index):</span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>            node <span class="op">=</span> manager.IndexToNode(index)</span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>            secuencia.append(node)</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>            carga <span class="op">+=</span> demandas[node]</span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>            index <span class="op">=</span> solution.Value(routing.NextVar(index))</span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>        secuencia.append(manager.IndexToNode(index))  <span class="co"># regreso al depot</span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(secuencia) <span class="op">&gt;</span> <span class="dv">2</span>:  <span class="co"># solo barcos que visitaron al menos un puerto</span></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>            cap <span class="op">=</span> capacidades_barcos[vehicle_id]</span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>            distancia_km <span class="op">=</span> <span class="bu">sum</span>(dist_matrix[a][b] <span class="cf">for</span> a, b <span class="kw">in</span> <span class="bu">zip</span>(secuencia, secuencia[<span class="dv">1</span>:]))</span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>            costo_clp <span class="op">=</span> <span class="bu">sum</span>(dist_matrix[a][b] <span class="op">*</span> costo_por_km[cap] <span class="cf">for</span> a, b <span class="kw">in</span> <span class="bu">zip</span>(secuencia, secuencia[<span class="dv">1</span>:]))</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>            rutas.append({</span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Barco"</span>: <span class="ss">f"Barco </span><span class="sc">{</span>vehicle_id <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Tipo"</span>: {<span class="dv">25</span>: <span class="st">"A"</span>, <span class="dv">60</span>: <span class="st">"B"</span>, <span class="dv">90</span>: <span class="st">"C"</span>}[cap],</span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Capacidad_ton"</span>: cap,</span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Carga_ton"</span>: carga,</span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Distancia_km"</span>: <span class="bu">round</span>(distancia_km, <span class="dv">1</span>),</span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Costo_CLP"</span>: <span class="bu">round</span>(costo_clp),</span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Secuencia_nodos"</span>: secuencia,</span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Ruta"</span>: <span class="st">" → "</span>.join(nodos.loc[i, <span class="st">"Puerto"</span>] <span class="cf">for</span> i <span class="kw">in</span> secuencia)</span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a>            })</span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>    tabla <span class="op">=</span> pd.DataFrame(rutas)[columnas <span class="op">+</span> [<span class="st">"Secuencia_nodos"</span>]] <span class="cf">if</span> rutas <span class="cf">else</span> pd.DataFrame(columns<span class="op">=</span>columnas)</span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tabla, rutas</span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> formatear_tabla(tabla):</span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a>    vista <span class="op">=</span> tabla.drop(columns<span class="op">=</span>[<span class="st">"Secuencia_nodos"</span>], errors<span class="op">=</span><span class="st">"ignore"</span>).copy()</span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">"Costo_CLP"</span> <span class="kw">in</span> vista <span class="kw">and</span> <span class="bu">len</span>(vista):</span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>        vista[<span class="st">"Costo_CLP"</span>] <span class="op">=</span> vista[<span class="st">"Costo_CLP"</span>].<span class="bu">map</span>(<span class="kw">lambda</span> x: <span class="ss">f"$</span><span class="sc">{</span>x<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> vista</span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> resumen_modelo(tabla):</span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(tabla) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pd.DataFrame({<span class="st">"Métrica"</span>: [<span class="st">"Estado"</span>], <span class="st">"Valor"</span>: [<span class="st">"Sin solución factible"</span>]})</span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.DataFrame({</span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Métrica"</span>: [<span class="st">"Barcos usados"</span>, <span class="st">"Distancia total (km)"</span>, <span class="st">"Ruta más larga (km)"</span>, <span class="st">"Carga total (ton)"</span>, <span class="st">"Costo total (CLP)"</span>],</span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Valor"</span>: [</span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>            <span class="bu">len</span>(tabla),</span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a>            <span class="bu">round</span>(tabla[<span class="st">"Distancia_km"</span>].<span class="bu">sum</span>(), <span class="dv">1</span>),</span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>            <span class="bu">round</span>(tabla[<span class="st">"Distancia_km"</span>].<span class="bu">max</span>(), <span class="dv">1</span>),</span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>            <span class="bu">int</span>(tabla[<span class="st">"Carga_ton"</span>].<span class="bu">sum</span>()),</span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"$</span><span class="sc">{</span>tabla[<span class="st">'Costo_CLP'</span>]<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">:,.0f}</span><span class="ss">"</span></span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>    })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Solución encontrada</code></pre>
 </div>
-</div>
-</section>
-<section id="resultados-las-rutas-de-la-semana" class="level2">
-<h2 class="anchored" data-anchor-id="resultados-las-rutas-de-la-semana">Resultados: las rutas de la semana</h2>
-<p>Extraemos, para cada barco realmente utilizado, la secuencia de puertos visitados, la carga que transporta y la distancia recorrida.</p>
-<div id="e18799a3" class="cell" data-execution_count="8">
+<section id="fase-1-minimizar-el-costo-total-de-la-flota" class="level3">
+<h3 class="anchored" data-anchor-id="fase-1-minimizar-el-costo-total-de-la-flota">Fase 1: minimizar el costo total de la flota</h3>
+<div id="2e2cb959" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Ver código</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tipo_barco(vehicle_id):</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    cap <span class="op">=</span> capacidades_barcos[vehicle_id]</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="dv">25</span>: <span class="st">"A"</span>, <span class="dv">60</span>: <span class="st">"B"</span>, <span class="dv">90</span>: <span class="st">"C"</span>}[cap]</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>rutas <span class="op">=</span> []</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> vehicle_id <span class="kw">in</span> <span class="bu">range</span>(num_vehiculos):</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    index <span class="op">=</span> routing.Start(vehicle_id)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    ruta_nodos <span class="op">=</span> []</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    carga_ruta <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    distancia_ruta <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="kw">not</span> routing.IsEnd(index):</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>        node <span class="op">=</span> manager.IndexToNode(index)</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>        ruta_nodos.append(node)</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>        carga_ruta <span class="op">+=</span> demandas[node]</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        next_index <span class="op">=</span> solution.Value(routing.NextVar(index))</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>        distancia_ruta <span class="op">+=</span> routing.GetArcCostForVehicle(index, next_index, vehicle_id)</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>        index <span class="op">=</span> next_index</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    ruta_nodos.append(manager.IndexToNode(index))  <span class="co"># regreso al depot</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(ruta_nodos) <span class="op">&gt;</span> <span class="dv">2</span>:  <span class="co"># solo barcos que visitaron al menos un puerto</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        rutas.append({</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Barco"</span>: <span class="ss">f"Barco </span><span class="sc">{</span>vehicle_id <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Tipo"</span>: tipo_barco(vehicle_id),</span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Capacidad_ton"</span>: capacidades_barcos[vehicle_id],</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Carga_ton"</span>: carga_ruta,</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Distancia_km"</span>: <span class="bu">round</span>(distancia_ruta <span class="op">/</span> <span class="dv">1000</span>, <span class="dv">1</span>),</span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Secuencia_nodos"</span>: ruta_nodos,</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Ruta"</span>: <span class="st">" → "</span>.join(nodos.loc[i, <span class="st">"Puerto"</span>] <span class="cf">for</span> i <span class="kw">in</span> ruta_nodos)</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>        })</span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>rutas_df <span class="op">=</span> pd.DataFrame(rutas)[[<span class="st">"Barco"</span>, <span class="st">"Tipo"</span>, <span class="st">"Capacidad_ton"</span>, <span class="st">"Carga_ton"</span>, <span class="st">"Distancia_km"</span>, <span class="st">"Ruta"</span>]]</span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>rutas_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>manager_f1, routing_f1, solution_f1 <span class="op">=</span> construir_modelo(usar_costo_por_tipo<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>rutas_df_f1, rutas_f1 <span class="op">=</span> extraer_rutas(manager_f1, routing_f1, solution_f1)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>formatear_tabla(rutas_df_f1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="8">
+<div class="cell-output cell-output-display" data-execution_count="9">
 <div>
 
 
@@ -793,35 +924,49 @@ La flota completa nunca es necesaria: sobra capacidad de sobra incluso usando po
 <th data-quarto-table-cell-role="th">Capacidad_ton</th>
 <th data-quarto-table-cell-role="th">Carga_ton</th>
 <th data-quarto-table-cell-role="th">Distancia_km</th>
+<th data-quarto-table-cell-role="th">Costo_CLP</th>
 <th data-quarto-table-cell-role="th">Ruta</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>Barco 18</td>
-<td>C</td>
-<td>90</td>
-<td>77</td>
-<td>2866.3</td>
+<td>Barco 2</td>
+<td>A</td>
+<td>25</td>
+<td>19</td>
+<td>2866.1</td>
+<td>$2,866,139,057</td>
 <td>Puerto de Valparaíso → Puerto de Iquique → Pue...</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>Barco 19</td>
-<td>C</td>
-<td>90</td>
-<td>51</td>
-<td>126.5</td>
-<td>Puerto de Valparaíso → Puerto de San Antonio →...</td>
+<td>Barco 10</td>
+<td>B</td>
+<td>60</td>
+<td>58</td>
+<td>2099.6</td>
+<td>$6,298,716,457</td>
+<td>Puerto de Valparaíso → Puerto de Antofagasta →...</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>Barco 20</td>
+<td>Barco 13</td>
+<td>B</td>
+<td>60</td>
+<td>51</td>
+<td>126.5</td>
+<td>$379,501,841</td>
+<td>Puerto de Valparaíso → Puerto de San Antonio →...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Barco 16</td>
 <td>C</td>
 <td>90</td>
 <td>78</td>
 <td>932.3</td>
+<td>$4,661,575,437</td>
 <td>Puerto de Valparaíso → Puerto Coronel → Puerto...</td>
 </tr>
 </tbody>
@@ -830,28 +975,12 @@ La flota completa nunca es necesaria: sobra capacidad de sobra incluso usando po
 </div>
 </div>
 </div>
-<div id="129d8c7c" class="cell" data-execution_count="9">
+<div id="758980ca" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Ver código</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>resumen <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Métrica"</span>: [</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Barcos disponibles en la flota"</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Barcos usados esta semana"</span>,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Distancia total recorrida (km)"</span>,</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Carga total transportada (ton)"</span>,</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Utilización de la capacidad usada"</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    ],</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Valor"</span>: [</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        num_vehiculos,</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">len</span>(rutas_df),</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="bu">round</span>(rutas_df[<span class="st">"Distancia_km"</span>].<span class="bu">sum</span>(), <span class="dv">1</span>),</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        <span class="bu">int</span>(rutas_df[<span class="st">"Carga_ton"</span>].<span class="bu">sum</span>()),</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span><span class="dv">100</span> <span class="op">*</span> rutas_df[<span class="st">'Carga_ton'</span>]<span class="sc">.</span><span class="bu">sum</span>() <span class="op">/</span> rutas_df[<span class="st">'Capacidad_ton'</span>]<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">:.1f}</span><span class="ss">%"</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>resumen</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>resumen_modelo(rutas_df_f1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="10">
 <div>
 
 
@@ -866,28 +995,28 @@ La flota completa nunca es necesaria: sobra capacidad de sobra incluso usando po
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>Barcos disponibles en la flota</td>
-<td>20</td>
+<td>Barcos usados</td>
+<td>4</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>Barcos usados esta semana</td>
-<td>3</td>
+<td>Distancia total (km)</td>
+<td>6024.5</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>Distancia total recorrida (km)</td>
-<td>3925.1</td>
+<td>Ruta más larga (km)</td>
+<td>2866.1</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>Carga total transportada (ton)</td>
+<td>Carga total (ton)</td>
 <td>206</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>Utilización de la capacidad usada</td>
-<td>76.3%</td>
+<td>Costo total (CLP)</td>
+<td>$14,205,932,792</td>
 </tr>
 </tbody>
 </table>
@@ -895,47 +1024,530 @@ La flota completa nunca es necesaria: sobra capacidad de sobra incluso usando po
 </div>
 </div>
 </div>
-<p>El resultado confirma la intuición: con solo 5 puertos con demanda y una flota de 20 barcos, el algoritmo <strong>no necesita usar toda la flota</strong> — le basta con los barcos de mayor capacidad para cubrir la demanda semanal minimizando la distancia recorrida.</p>
-<p>Por último, visualizamos las rutas óptimas sobre el mapa, cada una con un color distinto:</p>
-<div id="531f00c1" class="cell" data-execution_count="10">
+<p>La estructura de rutas cambia frente al modelo que solo miraba distancia: cuando cada barco tiene su propio costo por km, al algoritmo le puede convenir usar <strong>más barcos pequeños y baratos</strong> en vez de consolidar todo en pocos barcos grandes, aunque eso signifique recorrer más kilómetros en total. Lo confirmamos comparando contra la solución que solo minimizaba distancia (la del modelo original), evaluada con los precios reales:</p>
+<div id="fb856960" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Ver código</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.graph_objects <span class="im">as</span> go</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>colores <span class="op">=</span> px.colors.qualitative.Set2</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>fig_rutas <span class="op">=</span> go.Figure()</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>fig_rutas.add_trace(go.Scattergeo(</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    lat<span class="op">=</span>nodos[<span class="st">"Latitud"</span>], lon<span class="op">=</span>nodos[<span class="st">"Longitud"</span>], text<span class="op">=</span>nodos[<span class="st">"Puerto"</span>],</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"markers+text"</span>, textposition<span class="op">=</span><span class="st">"top center"</span>,</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    marker<span class="op">=</span><span class="bu">dict</span>(size<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span><span class="st">"black"</span>, symbol<span class="op">=</span><span class="st">"circle"</span>),</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"Puertos"</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>))</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, ruta <span class="kw">in</span> <span class="bu">enumerate</span>(rutas):</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    secuencia <span class="op">=</span> ruta[<span class="st">"Secuencia_nodos"</span>]</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    fig_rutas.add_trace(go.Scattergeo(</span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>        lat<span class="op">=</span>nodos.loc[secuencia, <span class="st">"Latitud"</span>],</span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>        lon<span class="op">=</span>nodos.loc[secuencia, <span class="st">"Longitud"</span>],</span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>        mode<span class="op">=</span><span class="st">"lines+markers"</span>,</span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>        line<span class="op">=</span><span class="bu">dict</span>(width<span class="op">=</span><span class="dv">3</span>, color<span class="op">=</span>colores[i <span class="op">%</span> <span class="bu">len</span>(colores)]),</span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>        marker<span class="op">=</span><span class="bu">dict</span>(size<span class="op">=</span><span class="dv">6</span>, color<span class="op">=</span>colores[i <span class="op">%</span> <span class="bu">len</span>(colores)]),</span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>ruta[<span class="st">'Barco'</span>]<span class="sc">}</span><span class="ss"> (Tipo </span><span class="sc">{</span>ruta[<span class="st">'Tipo'</span>]<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>ruta[<span class="st">'Carga_ton'</span>]<span class="sc">}</span><span class="ss"> ton)"</span></span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    ))</span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>fig_rutas.update_geos(fitbounds<span class="op">=</span><span class="st">"locations"</span>, showland<span class="op">=</span><span class="va">True</span>, landcolor<span class="op">=</span><span class="st">"rgb(235,235,235)"</span>, showcountries<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>fig_rutas.update_layout(</span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="st">"Rutas óptimas de la flota — semana de ejemplo"</span>,</span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    height<span class="op">=</span><span class="dv">600</span>, margin<span class="op">=</span><span class="bu">dict</span>(l<span class="op">=</span><span class="dv">0</span>, r<span class="op">=</span><span class="dv">0</span>, t<span class="op">=</span><span class="dv">50</span>, b<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>fig_rutas.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>manager_dist, routing_dist, solution_dist <span class="op">=</span> construir_modelo(usar_costo_por_tipo<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>rutas_df_dist, _ <span class="op">=</span> extraer_rutas(manager_dist, routing_dist, solution_dist)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>comparacion_objetivo <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Estrategia"</span>: [<span class="st">"Minimizar distancia"</span>, <span class="st">"Minimizar costo (Fase 1)"</span>],</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Barcos_usados"</span>: [<span class="bu">len</span>(rutas_df_dist), <span class="bu">len</span>(rutas_df_f1)],</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Distancia_total_km"</span>: [<span class="bu">round</span>(rutas_df_dist[<span class="st">"Distancia_km"</span>].<span class="bu">sum</span>(), <span class="dv">1</span>), <span class="bu">round</span>(rutas_df_f1[<span class="st">"Distancia_km"</span>].<span class="bu">sum</span>(), <span class="dv">1</span>)],</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Costo_total_CLP"</span>: [rutas_df_dist[<span class="st">"Costo_CLP"</span>].<span class="bu">sum</span>(), rutas_df_f1[<span class="st">"Costo_CLP"</span>].<span class="bu">sum</span>()]</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>comparacion_objetivo[<span class="st">"Costo_total_CLP"</span>] <span class="op">=</span> comparacion_objetivo[<span class="st">"Costo_total_CLP"</span>].<span class="bu">map</span>(<span class="kw">lambda</span> x: <span class="ss">f"$</span><span class="sc">{</span>x<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>comparacion_objetivo</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Estrategia</th>
+<th data-quarto-table-cell-role="th">Barcos_usados</th>
+<th data-quarto-table-cell-role="th">Distancia_total_km</th>
+<th data-quarto-table-cell-role="th">Costo_total_CLP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Minimizar distancia</td>
+<td>3</td>
+<td>3925.1</td>
+<td>$19,625,681,549</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Minimizar costo (Fase 1)</td>
+<td>4</td>
+<td>6024.5</td>
+<td>$14,205,932,792</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>La ruta más barata para la semana no es necesariamente la más corta: <strong>minimizar distancia y minimizar costo son objetivos distintos</strong> en cuanto la flota es heterogénea en precio, y elegir el objetivo equivocado tiene un costo real en pesos.</p>
+</section>
+</section>
+<section id="restricción-tope-máximo-de-distancia-por-ruta" class="level2">
+<h2 class="anchored" data-anchor-id="restricción-tope-máximo-de-distancia-por-ruta">Restricción: tope máximo de distancia por ruta</h2>
+<p>Además del costo, un controlador de rutas real quiere evitar que un barco quede fuera varios días en una ruta excesivamente larga (riesgo operacional, fatiga de la tripulación, exposición a mal tiempo). Para eso agregamos un <strong>tope máximo de distancia por ruta</strong>: cada barco, individualmente, no puede recorrer más de un cierto límite en su ruta semanal.</p>
+<p>Definimos ese límite como <strong>1,5 veces la distancia promedio esperada por ruta</strong> — usamos la distancia promedio de las rutas de la Fase 1 como estimador de esa “carga de trabajo” esperada por barco:</p>
+<div id="6047cff5" class="cell" data-execution_count="12">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>distancia_promedio_ruta <span class="op">=</span> rutas_df_f1[<span class="st">"Distancia_km"</span>].mean()</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>tope_naive_km <span class="op">=</span> <span class="fl">1.5</span> <span class="op">*</span> distancia_promedio_ruta</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Distancia promedio esperada por ruta (Fase 1): </span><span class="sc">{</span>distancia_promedio_ruta<span class="sc">:.1f}</span><span class="ss"> km"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Tope propuesto (1.5x el promedio): </span><span class="sc">{</span>tope_naive_km<span class="sc">:.1f}</span><span class="ss"> km"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Distancia promedio esperada por ruta (Fase 1): 1506.1 km
+Tope propuesto (1.5x el promedio): 2259.2 km</code></pre>
+</div>
+</div>
+<div id="d4213995" class="cell" data-execution_count="13">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>manager_f2, routing_f2, solution_f2 <span class="op">=</span> construir_modelo(usar_costo_por_tipo<span class="op">=</span><span class="va">True</span>, tope_distancia_km<span class="op">=</span>tope_naive_km)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Resultado con el tope naive:"</span>, <span class="st">"solución encontrada"</span> <span class="cf">if</span> solution_f2 <span class="cf">else</span> <span class="st">"INFACTIBLE — el solver no encuentra ninguna asignación válida"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Resultado con el tope naive: INFACTIBLE — el solver no encuentra ninguna asignación válida</code></pre>
+</div>
+</div>
+<p>El modelo <strong>queda infactible</strong>. La razón no es un error de código: ningún barco puede visitar Puerto de Iquique sin superar el tope, porque el solo viaje de ida y vuelta a Iquique ya excede el límite que calculamos.</p>
+<div id="657842de" class="cell" data-execution_count="14">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>ida_vuelta_por_puerto <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Puerto"</span>: puertos_demanda[<span class="st">"Puerto"</span>],</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Ida_vuelta_km"</span>: [<span class="bu">round</span>(<span class="dv">2</span> <span class="op">*</span> dist_matrix[<span class="dv">0</span>, i], <span class="dv">1</span>) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_nodos)]</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>}).sort_values(<span class="st">"Ida_vuelta_km"</span>, ascending<span class="op">=</span><span class="va">False</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>ida_vuelta_por_puerto</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Puerto</th>
+<th data-quarto-table-cell-role="th">Ida_vuelta_km</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Puerto de Iquique</td>
+<td>2866.1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Puerto de Antofagasta</td>
+<td>2099.6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Puerto Coronel</td>
+<td>931.4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Puerto de San Vicente</td>
+<td>866.4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Puerto de San Antonio</td>
+<td>126.5</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Esta es una lección importante al fijar un tope: <strong>un promedio no protege contra un caso extremo</strong>. Iquique está mucho más lejos que el resto (casi el doble de la distancia promedio), así que cualquier tope calculado como “1,5x el promedio” corre el riesgo de excluir justamente al puerto más alejado — dejándolo, en la práctica, sin ninguna forma de ser atendido. Antes de fijar un tope hay que validarlo contra el peor caso, no solo contra el promedio:</p>
+<div id="7789a7c8" class="cell" data-execution_count="15">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>tope_final_km <span class="op">=</span> <span class="bu">round</span>(ida_vuelta_por_puerto[<span class="st">"Ida_vuelta_km"</span>].<span class="bu">max</span>() <span class="op">*</span> <span class="fl">1.2</span>, <span class="op">-</span><span class="dv">2</span>)  <span class="co"># 20% de margen sobre el puerto más lejano</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Tope corregido (ida y vuelta al puerto más lejano + 20% de margen): </span><span class="sc">{</span>tope_final_km<span class="sc">:.0f}</span><span class="ss"> km"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tope corregido (ida y vuelta al puerto más lejano + 20% de margen): 3400 km</code></pre>
+</div>
+</div>
+<div id="c7913479" class="cell" data-execution_count="16">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>manager_f2b, routing_f2b, solution_f2b <span class="op">=</span> construir_modelo(usar_costo_por_tipo<span class="op">=</span><span class="va">True</span>, tope_distancia_km<span class="op">=</span>tope_final_km)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>rutas_df_f2b, rutas_f2b <span class="op">=</span> extraer_rutas(manager_f2b, routing_f2b, solution_f2b)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Resultado con el tope corregido:"</span>, <span class="st">"solución encontrada"</span> <span class="cf">if</span> solution_f2b <span class="cf">else</span> <span class="st">"INFACTIBLE"</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>formatear_tabla(rutas_df_f2b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Resultado con el tope corregido: solución encontrada</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Barco</th>
+<th data-quarto-table-cell-role="th">Tipo</th>
+<th data-quarto-table-cell-role="th">Capacidad_ton</th>
+<th data-quarto-table-cell-role="th">Carga_ton</th>
+<th data-quarto-table-cell-role="th">Distancia_km</th>
+<th data-quarto-table-cell-role="th">Costo_CLP</th>
+<th data-quarto-table-cell-role="th">Ruta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Barco 2</td>
+<td>A</td>
+<td>25</td>
+<td>19</td>
+<td>2866.1</td>
+<td>$2,866,139,057</td>
+<td>Puerto de Valparaíso → Puerto de Iquique → Pue...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Barco 10</td>
+<td>B</td>
+<td>60</td>
+<td>58</td>
+<td>2099.6</td>
+<td>$6,298,716,457</td>
+<td>Puerto de Valparaíso → Puerto de Antofagasta →...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Barco 13</td>
+<td>B</td>
+<td>60</td>
+<td>51</td>
+<td>126.5</td>
+<td>$379,501,841</td>
+<td>Puerto de Valparaíso → Puerto de San Antonio →...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Barco 16</td>
+<td>C</td>
+<td>90</td>
+<td>78</td>
+<td>932.3</td>
+<td>$4,661,575,437</td>
+<td>Puerto de Valparaíso → Puerto Coronel → Puerto...</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="el-coeficiente-de-span-global-qué-es-y-por-qué-importa" class="level2">
+<h2 class="anchored" data-anchor-id="el-coeficiente-de-span-global-qué-es-y-por-qué-importa">El Coeficiente de Span Global: qué es y por qué importa</h2>
+<p>El tope anterior es una restricción <strong>dura</strong>: una ruta que lo supera simplemente no es una solución válida. Pero muchas veces no queremos prohibir rutas largas — solo <strong>desincentivarlas</strong>, para que el solver prefiera repartir el trabajo de forma más pareja cuando eso no cueste demasiado más caro. Para eso existe el <strong>Coeficiente de Span Global</strong> (<code>SetGlobalSpanCostCoefficient</code>).</p>
+<p>El “span” de una dimensión (en nuestro caso, “Distancia”) es la diferencia entre el valor acumulado más alto y el más bajo entre <strong>todos los vehículos de la flota</strong> al final de su ruta. El coeficiente multiplica ese span y lo suma al costo total que el solver minimiza:</p>
+<p><span class="math display">\[\text{costo total} = \text{costo de las rutas} + \text{coeficiente} \times (\text{ruta más larga} - \text{ruta más corta})\]</span></p>
+<p>Cuanto más alto el coeficiente, más “caro” resulta que una ruta sea mucho más larga que otra, y más empuja el solver a balancear las rutas entre sí.</p>
+<section id="un-detalle-que-hay-que-entender-antes-de-usarlo-los-barcos-ociosos-cuentan" class="level3">
+<h3 class="anchored" data-anchor-id="un-detalle-que-hay-que-entender-antes-de-usarlo-los-barcos-ociosos-cuentan">Un detalle que hay que entender antes de usarlo: los barcos ociosos cuentan</h3>
+<p>Nuestra flota tiene 20 barcos, pero la Fase 1 usa solo 4. Los 16 barcos que <strong>no salen del depot</strong> tienen una ruta trivial, con distancia acumulada igual a 0. Como el span se calcula contra el mínimo de <strong>toda la flota</strong>, ese mínimo casi siempre es 0 — no la ruta activa más corta. En la práctica, con una flota más grande de lo necesario, el Coeficiente de Span Global termina empujando principalmente a que <strong>la ruta más larga se achique</strong>, no a que las rutas activas se parezcan entre sí.</p>
+<p>Para ver el efecto de forma clara, lo probamos en el modelo simple (solo distancia, sin diferenciar costo por tipo de barco), donde el algoritmo sí tiene margen real para reestructurar rutas:</p>
+<div id="ddeeac44" class="cell" data-execution_count="17">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>resultados_sweep <span class="op">=</span> []</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> coef <span class="kw">in</span> [<span class="dv">0</span>, <span class="dv">10_000</span>, <span class="dv">50_000</span>, <span class="dv">300_000</span>]:</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    manager_s, routing_s, solution_s <span class="op">=</span> construir_modelo(</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>        usar_costo_por_tipo<span class="op">=</span><span class="va">False</span>, coeficiente_span<span class="op">=</span>coef <span class="cf">if</span> coef <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="va">None</span>, tiempo_limite_s<span class="op">=</span><span class="dv">3</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    tabla_s, _ <span class="op">=</span> extraer_rutas(manager_s, routing_s, solution_s)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    resultados_sweep.append({</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Coeficiente_span"</span>: coef,</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Barcos_usados"</span>: <span class="bu">len</span>(tabla_s),</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Distancia_total_km"</span>: <span class="bu">round</span>(tabla_s[<span class="st">"Distancia_km"</span>].<span class="bu">sum</span>(), <span class="dv">1</span>),</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Ruta_mas_larga_km"</span>: <span class="bu">round</span>(tabla_s[<span class="st">"Distancia_km"</span>].<span class="bu">max</span>(), <span class="dv">1</span>)</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>df_sweep <span class="op">=</span> pd.DataFrame(resultados_sweep)</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>df_sweep</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Coeficiente_span</th>
+<th data-quarto-table-cell-role="th">Barcos_usados</th>
+<th data-quarto-table-cell-role="th">Distancia_total_km</th>
+<th data-quarto-table-cell-role="th">Ruta_mas_larga_km</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0</td>
+<td>3</td>
+<td>3925.1</td>
+<td>2866.3</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>10000</td>
+<td>3</td>
+<td>3925.1</td>
+<td>2866.3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>50000</td>
+<td>4</td>
+<td>6024.5</td>
+<td>2866.1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>300000</td>
+<td>4</td>
+<td>6024.5</td>
+<td>2866.1</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="27be700f" class="cell" data-execution_count="18">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>etiquetas_coef <span class="op">=</span> [<span class="ss">f"</span><span class="sc">{</span>c<span class="sc">:,}</span><span class="ss">"</span> <span class="cf">for</span> c <span class="kw">in</span> df_sweep[<span class="st">"Coeficiente_span"</span>]]</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>fig_sweep <span class="op">=</span> go.Figure()</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>fig_sweep.add_trace(go.Bar(</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span>etiquetas_coef, y<span class="op">=</span>df_sweep[<span class="st">"Distancia_total_km"</span>],</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"Distancia total de la flota (km)"</span>, marker_color<span class="op">=</span><span class="st">"#2a78d6"</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>fig_sweep.add_trace(go.Bar(</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span>etiquetas_coef, y<span class="op">=</span>df_sweep[<span class="st">"Ruta_mas_larga_km"</span>],</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"Ruta más larga (km)"</span>, marker_color<span class="op">=</span><span class="st">"#008300"</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>fig_sweep.update_layout(</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    barmode<span class="op">=</span><span class="st">"group"</span>,</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="st">"Efecto del Coeficiente de Span Global (modelo simplificado, sin costo por tipo de barco)"</span>,</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    xaxis_title<span class="op">=</span><span class="st">"Coeficiente de span global"</span>,</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    yaxis_title<span class="op">=</span><span class="st">"Kilómetros"</span>,</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    height<span class="op">=</span><span class="dv">420</span>,</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="bu">dict</span>(orientation<span class="op">=</span><span class="st">"h"</span>, yanchor<span class="op">=</span><span class="st">"bottom"</span>, y<span class="op">=</span><span class="fl">1.02</span>, xanchor<span class="op">=</span><span class="st">"right"</span>, x<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    plot_bgcolor<span class="op">=</span><span class="st">"#fcfcfb"</span>, paper_bgcolor<span class="op">=</span><span class="st">"#fcfcfb"</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>fig_sweep.update_yaxes(gridcolor<span class="op">=</span><span class="st">"#e1e0d9"</span>)</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>fig_sweep.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div style="height:420px; width:100%;">            <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG"></script><script>if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}</script>                <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.7.0.min.js" integrity="sha256-jvTGqxNp8AGWEcvNLVuKr+8j5dGe9Yw51LQkmDH+IYA=" crossorigin="anonymous"></script>                <div id="5f8c31d7-b4b3-4c8c-9d2c-2b64d60642e9" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("5f8c31d7-b4b3-4c8c-9d2c-2b64d60642e9")) {                    Plotly.newPlot(                        "5f8c31d7-b4b3-4c8c-9d2c-2b64d60642e9",                        [{"marker":{"color":"#2a78d6"},"name":"Distancia total de la flota (km)","x":["0","10,000","50,000","300,000"],"y":{"dtype":"f8","bdata":"MzMzMzOqrkAzMzMzM6quQAAAAACAiLdAAAAAAICIt0A="},"type":"bar"},{"marker":{"color":"#008300"},"name":"Ruta m\u00e1s larga (km)","x":["0","10,000","50,000","300,000"],"y":{"dtype":"f8","bdata":"mpmZmZlkpkCamZmZmWSmQDMzMzMzZKZAMzMzMzNkpkA="},"type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"},"margin":{"b":0,"l":0,"r":0,"t":30}}},"legend":{"orientation":"h","yanchor":"bottom","y":1.02,"xanchor":"right","x":1},"barmode":"group","title":{"text":"Efecto del Coeficiente de Span Global (modelo simplificado, sin costo por tipo de barco)"},"xaxis":{"title":{"text":"Coeficiente de span global"}},"yaxis":{"title":{"text":"Kil\u00f3metros"},"gridcolor":"#e1e0d9"},"height":420,"plot_bgcolor":"#fcfcfb","paper_bgcolor":"#fcfcfb"},                        {"responsive": true}                    ).then(function(){
+                            
+var gd = document.getElementById('5f8c31d7-b4b3-4c8c-9d2c-2b64d60642e9');
+var x = new MutationObserver(function (mutations, observer) {{
+        var display = window.getComputedStyle(gd).display;
+        if (!display || display === 'none') {{
+            console.log([gd, 'removed!']);
+            Plotly.purge(gd);
+            observer.disconnect();
+        }}
+}});
+
+// Listen for the removal of the full notebook cells
+var notebookContainer = gd.closest('#notebook-container');
+if (notebookContainer) {{
+    x.observe(notebookContainer, {childList: true});
+}}
+
+// Listen for the clearing of the current output cell
+var outputEl = gd.closest('.output');
+if (outputEl) {{
+    x.observe(outputEl, {childList: true});
+}}
+
+                        })                };            </script>        </div>
+</div>
+</div>
+<p>Con coeficiente 0 o bajo, el solver combina Iquique y Antofagasta en una sola ruta (más barata en distancia total). A partir de cierto umbral, el coeficiente hace que valga la pena <strong>separar esa ruta en dos</strong> — porque eso reduce, aunque sea levemente, la ruta más larga — a costa de un salto grande en la distancia total de la flota. Ese es exactamente el riesgo de subir el coeficiente sin control: <strong>una mejora marginal en el balance puede pagarse con un aumento importante en el costo total</strong>, precisamente porque el punto de comparación (el mínimo) está fijado en cero por los barcos ociosos, no por una ruta activa real. Por eso es tan importante entender el mecanismo antes de calibrar el coeficiente — no es un simple “mientras más alto, más parejo y mejor”.</p>
+</section>
+<section id="modelo-final-costo-por-tipo-de-barco-tope-de-distancia-coeficiente-de-span-global" class="level3">
+<h3 class="anchored" data-anchor-id="modelo-final-costo-por-tipo-de-barco-tope-de-distancia-coeficiente-de-span-global">Modelo final: costo por tipo de barco + tope de distancia + Coeficiente de Span Global</h3>
+<p>Aplicamos las tres mejoras juntas: costo real por tipo de barco, el tope de distancia corregido, y un Coeficiente de Span Global moderado.</p>
+<div id="69dd7b19" class="cell" data-execution_count="19">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>manager_f3, routing_f3, solution_f3 <span class="op">=</span> construir_modelo(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    usar_costo_por_tipo<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    tope_distancia_km<span class="op">=</span>tope_final_km,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    coeficiente_span<span class="op">=</span><span class="dv">300_000</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>rutas_df_f3, rutas_f3 <span class="op">=</span> extraer_rutas(manager_f3, routing_f3, solution_f3)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>formatear_tabla(rutas_df_f3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Barco</th>
+<th data-quarto-table-cell-role="th">Tipo</th>
+<th data-quarto-table-cell-role="th">Capacidad_ton</th>
+<th data-quarto-table-cell-role="th">Carga_ton</th>
+<th data-quarto-table-cell-role="th">Distancia_km</th>
+<th data-quarto-table-cell-role="th">Costo_CLP</th>
+<th data-quarto-table-cell-role="th">Ruta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Barco 2</td>
+<td>A</td>
+<td>25</td>
+<td>19</td>
+<td>2866.1</td>
+<td>$2,866,139,057</td>
+<td>Puerto de Valparaíso → Puerto de Iquique → Pue...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Barco 10</td>
+<td>B</td>
+<td>60</td>
+<td>58</td>
+<td>2099.6</td>
+<td>$6,298,716,457</td>
+<td>Puerto de Valparaíso → Puerto de Antofagasta →...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Barco 13</td>
+<td>B</td>
+<td>60</td>
+<td>51</td>
+<td>126.5</td>
+<td>$379,501,841</td>
+<td>Puerto de Valparaíso → Puerto de San Antonio →...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Barco 16</td>
+<td>C</td>
+<td>90</td>
+<td>78</td>
+<td>932.3</td>
+<td>$4,661,575,437</td>
+<td>Puerto de Valparaíso → Puerto Coronel → Puerto...</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="5404c532" class="cell" data-execution_count="20">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>resumen_modelo(rutas_df_f3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Métrica</th>
+<th data-quarto-table-cell-role="th">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Barcos usados</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Distancia total (km)</td>
+<td>6024.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Ruta más larga (km)</td>
+<td>2866.1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Carga total (ton)</td>
+<td>206</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Costo total (CLP)</td>
+<td>$14,205,932,792</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>En esta semana en particular, el resultado final coincide con el de la Fase 1: el tope no restringe ninguna ruta (todas quedan cómodamente por debajo) y el coeficiente de span tampoco cambia nada, porque cada ruta activa ya visita un solo puerto por el camino más corto posible — no hay forma de acortarlas más sin dejar de atender ese puerto. No es un resultado decepcionante: confirma que la solución de la Fase 1 ya era robusta frente a estas dos restricciones adicionales. En una semana con una demanda distinta —donde sí exista margen para combinar o separar puertos— el tope y el coeficiente sí pueden cambiar la solución, tal como vimos en el ejemplo simplificado de la sección anterior.</p>
+<p>Por último, visualizamos las rutas finales sobre el mapa:</p>
+<div id="86b1ebe9" class="cell" data-execution_count="21">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>colores <span class="op">=</span> px.colors.qualitative.Set2</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>fig_rutas <span class="op">=</span> go.Figure()</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>fig_rutas.add_trace(go.Scattergeo(</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    lat<span class="op">=</span>nodos[<span class="st">"Latitud"</span>], lon<span class="op">=</span>nodos[<span class="st">"Longitud"</span>], text<span class="op">=</span>nodos[<span class="st">"Puerto"</span>],</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"markers+text"</span>, textposition<span class="op">=</span><span class="st">"top center"</span>,</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    marker<span class="op">=</span><span class="bu">dict</span>(size<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span><span class="st">"black"</span>, symbol<span class="op">=</span><span class="st">"circle"</span>),</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"Puertos"</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, ruta <span class="kw">in</span> <span class="bu">enumerate</span>(rutas_f3):</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    secuencia <span class="op">=</span> ruta[<span class="st">"Secuencia_nodos"</span>]</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    fig_rutas.add_trace(go.Scattergeo(</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>        lat<span class="op">=</span>nodos.loc[secuencia, <span class="st">"Latitud"</span>],</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>        lon<span class="op">=</span>nodos.loc[secuencia, <span class="st">"Longitud"</span>],</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>        mode<span class="op">=</span><span class="st">"lines+markers"</span>,</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>        line<span class="op">=</span><span class="bu">dict</span>(width<span class="op">=</span><span class="dv">3</span>, color<span class="op">=</span>colores[i <span class="op">%</span> <span class="bu">len</span>(colores)]),</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>        marker<span class="op">=</span><span class="bu">dict</span>(size<span class="op">=</span><span class="dv">6</span>, color<span class="op">=</span>colores[i <span class="op">%</span> <span class="bu">len</span>(colores)]),</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>ruta[<span class="st">'Barco'</span>]<span class="sc">}</span><span class="ss"> (Tipo </span><span class="sc">{</span>ruta[<span class="st">'Tipo'</span>]<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>ruta[<span class="st">'Carga_ton'</span>]<span class="sc">}</span><span class="ss"> ton)"</span></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>fig_rutas.update_geos(fitbounds<span class="op">=</span><span class="st">"locations"</span>, showland<span class="op">=</span><span class="va">True</span>, landcolor<span class="op">=</span><span class="st">"rgb(235,235,235)"</span>, showcountries<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>fig_rutas.update_layout(</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="st">"Rutas finales de la flota — costo por tipo de barco + tope de distancia + span global"</span>,</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    height<span class="op">=</span><span class="dv">600</span>, margin<span class="op">=</span><span class="bu">dict</span>(l<span class="op">=</span><span class="dv">0</span>, r<span class="op">=</span><span class="dv">0</span>, t<span class="op">=</span><span class="dv">50</span>, b<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>fig_rutas.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div style="height:600px; width:100%;">            <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG"></script><script>if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}</script>                <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
-        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.7.0.min.js" integrity="sha256-jvTGqxNp8AGWEcvNLVuKr+8j5dGe9Yw51LQkmDH+IYA=" crossorigin="anonymous"></script>                <div id="9b1986ed-f583-49be-8b43-08807df84253" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("9b1986ed-f583-49be-8b43-08807df84253")) {                    Plotly.newPlot(                        "9b1986ed-f583-49be-8b43-08807df84253",                        [{"lat":{"dtype":"f8","bdata":"KxTpfk6DQMAgf2lRnzQ0wAvUYvAwpTfA16axvRbMQMDNzMzMzFxCwDMzMzMzg0LA"},"lon":{"dtype":"f8","bdata":"5ueGpuzoUcCO5sjKL4pRwHanO088m1HAxNFVurvnUcA8LqpFREhSwCo4vCAiSlLA"},"marker":{"color":"black","size":10,"symbol":"circle"},"mode":"markers+text","name":"Puertos","text":["Puerto de Valpara\u00edso","Puerto de Iquique","Puerto de Antofagasta","Puerto de San Antonio","Puerto de San Vicente","Puerto Coronel"],"textposition":"top center","type":"scattergeo"},{"lat":{"dtype":"f8","bdata":"KxTpfk6DQMAgf2lRnzQ0wAvUYvAwpTfAKxTpfk6DQMA="},"line":{"color":"rgb(102,194,165)","width":3},"lon":{"dtype":"f8","bdata":"5ueGpuzoUcCO5sjKL4pRwHanO088m1HA5ueGpuzoUcA="},"marker":{"color":"rgb(102,194,165)","size":6},"mode":"lines+markers","name":"Barco 18 (Tipo C, 77 ton)","type":"scattergeo"},{"lat":{"dtype":"f8","bdata":"KxTpfk6DQMDXprG9FsxAwCsU6X5Og0DA"},"line":{"color":"rgb(252,141,98)","width":3},"lon":{"dtype":"f8","bdata":"5ueGpuzoUcDE0VW6u+dRwObnhqbs6FHA"},"marker":{"color":"rgb(252,141,98)","size":6},"mode":"lines+markers","name":"Barco 19 (Tipo C, 51 ton)","type":"scattergeo"},{"lat":{"dtype":"f8","bdata":"KxTpfk6DQMAzMzMzM4NCwM3MzMzMXELAKxTpfk6DQMA="},"line":{"color":"rgb(141,160,203)","width":3},"lon":{"dtype":"f8","bdata":"5ueGpuzoUcAqOLwgIkpSwDwuqkVESFLA5ueGpuzoUcA="},"marker":{"color":"rgb(141,160,203)","size":6},"mode":"lines+markers","name":"Barco 20 (Tipo C, 78 ton)","type":"scattergeo"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"},"margin":{"b":0,"l":0,"r":0,"t":30}}},"geo":{"fitbounds":"locations","showland":true,"landcolor":"rgb(235,235,235)","showcountries":true},"margin":{"l":0,"r":0,"t":50,"b":0},"title":{"text":"Rutas \u00f3ptimas de la flota \u2014 semana de ejemplo"},"height":600},                        {"responsive": true}                    ).then(function(){
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.7.0.min.js" integrity="sha256-jvTGqxNp8AGWEcvNLVuKr+8j5dGe9Yw51LQkmDH+IYA=" crossorigin="anonymous"></script>                <div id="a77c8e47-992f-484d-ba66-771296d10997" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("a77c8e47-992f-484d-ba66-771296d10997")) {                    Plotly.newPlot(                        "a77c8e47-992f-484d-ba66-771296d10997",                        [{"lat":{"dtype":"f8","bdata":"KxTpfk6DQMAgf2lRnzQ0wAvUYvAwpTfA16axvRbMQMDNzMzMzFxCwDMzMzMzg0LA"},"lon":{"dtype":"f8","bdata":"5ueGpuzoUcCO5sjKL4pRwHanO088m1HAxNFVurvnUcA8LqpFREhSwCo4vCAiSlLA"},"marker":{"color":"black","size":10,"symbol":"circle"},"mode":"markers+text","name":"Puertos","text":["Puerto de Valpara\u00edso","Puerto de Iquique","Puerto de Antofagasta","Puerto de San Antonio","Puerto de San Vicente","Puerto Coronel"],"textposition":"top center","type":"scattergeo"},{"lat":{"dtype":"f8","bdata":"KxTpfk6DQMAgf2lRnzQ0wCsU6X5Og0DA"},"line":{"color":"rgb(102,194,165)","width":3},"lon":{"dtype":"f8","bdata":"5ueGpuzoUcCO5sjKL4pRwObnhqbs6FHA"},"marker":{"color":"rgb(102,194,165)","size":6},"mode":"lines+markers","name":"Barco 2 (Tipo A, 19 ton)","type":"scattergeo"},{"lat":{"dtype":"f8","bdata":"KxTpfk6DQMAL1GLwMKU3wCsU6X5Og0DA"},"line":{"color":"rgb(252,141,98)","width":3},"lon":{"dtype":"f8","bdata":"5ueGpuzoUcB2pztPPJtRwObnhqbs6FHA"},"marker":{"color":"rgb(252,141,98)","size":6},"mode":"lines+markers","name":"Barco 10 (Tipo B, 58 ton)","type":"scattergeo"},{"lat":{"dtype":"f8","bdata":"KxTpfk6DQMDXprG9FsxAwCsU6X5Og0DA"},"line":{"color":"rgb(141,160,203)","width":3},"lon":{"dtype":"f8","bdata":"5ueGpuzoUcDE0VW6u+dRwObnhqbs6FHA"},"marker":{"color":"rgb(141,160,203)","size":6},"mode":"lines+markers","name":"Barco 13 (Tipo B, 51 ton)","type":"scattergeo"},{"lat":{"dtype":"f8","bdata":"KxTpfk6DQMAzMzMzM4NCwM3MzMzMXELAKxTpfk6DQMA="},"line":{"color":"rgb(231,138,195)","width":3},"lon":{"dtype":"f8","bdata":"5ueGpuzoUcAqOLwgIkpSwDwuqkVESFLA5ueGpuzoUcA="},"marker":{"color":"rgb(231,138,195)","size":6},"mode":"lines+markers","name":"Barco 16 (Tipo C, 78 ton)","type":"scattergeo"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"},"margin":{"b":0,"l":0,"r":0,"t":30}}},"geo":{"fitbounds":"locations","showland":true,"landcolor":"rgb(235,235,235)","showcountries":true},"margin":{"l":0,"r":0,"t":50,"b":0},"title":{"text":"Rutas finales de la flota \u2014 costo por tipo de barco + tope de distancia + span global"},"height":600},                        {"responsive": true}                    ).then(function(){
                             
-var gd = document.getElementById('9b1986ed-f583-49be-8b43-08807df84253');
+var gd = document.getElementById('a77c8e47-992f-484d-ba66-771296d10997');
 var x = new MutationObserver(function (mutations, observer) {{
         var display = window.getComputedStyle(gd).display;
         if (!display || display === 'none') {{
@@ -961,16 +1573,19 @@ if (outputEl) {{
 </div>
 </div>
 </section>
+</section>
 <section id="conclusiones-y-límites-del-ejemplo" class="level2">
 <h2 class="anchored" data-anchor-id="conclusiones-y-límites-del-ejemplo">Conclusiones y límites del ejemplo</h2>
-<p>El algoritmo de OR-Tools resuelve en segundos un problema que, a mano, requeriría evaluar miles de combinaciones posibles de barcos y órdenes de visita. Algunos supuestos que simplifican el ejemplo, y que valdría la pena relajar en un caso real:</p>
+<p>El algoritmo de OR-Tools resuelve en segundos un problema que, a mano, requeriría evaluar miles de combinaciones posibles de barcos y órdenes de visita. Algunas lecciones de esta iteración, y supuestos que valdría la pena relajar en un caso real:</p>
 <ul>
+<li><strong>Minimizar costo no es lo mismo que minimizar distancia:</strong> con una flota heterogénea en precio, el objetivo correcto cambia la estructura de las rutas, no solo su magnitud.</li>
+<li><strong>Un tope calculado como “promedio × factor” hay que validarlo contra el peor caso:</strong> un promedio puede esconder un destino extremo (como Iquique) que un tope naive dejaría inalcanzable, volviendo el problema entero infactible.</li>
+<li><strong>El Coeficiente de Span Global compara contra toda la flota, no solo contra las rutas activas:</strong> cuando sobran barcos, el “mínimo” de la comparación casi siempre es cero (barcos ociosos), así que el coeficiente termina presionando sobre todo a la ruta más larga — y subirlo demasiado puede comprar un balance marginal a un costo total desproporcionado.</li>
 <li><strong>Distancia en línea recta:</strong> ignoramos corredores de navegación, corrientes y rutas costeras reales.</li>
 <li><strong>Sin ventanas de tiempo:</strong> no consideramos horarios de atraque, tiempos de carga/descarga ni disponibilidad de muelles.</li>
 <li><strong>Demanda sintética y de una sola semana:</strong> en la práctica la demanda varía semana a semana y convendría planificar con un horizonte de varias semanas.</li>
-<li><strong>Sin costos fijos por barco:</strong> el modelo minimiza solo distancia; si se quisiera penalizar el uso de más barcos (por ejemplo, costos de tripulación), habría que agregar un costo fijo por vehículo usado.</li>
 </ul>
-<p>Aun con estas simplificaciones, el ejemplo muestra el patrón central de cualquier problema de ruteo aplicado: <strong>datos de ubicación + capacidades + demanda → modelo de optimización → rutas ejecutables</strong>, el mismo patrón que se usa en logística de última milla, distribución de combustible o, en este caso, cabotaje marítimo.</p>
+<p>Aun con estas simplificaciones, el ejemplo muestra el patrón central de cualquier problema de ruteo aplicado: <strong>datos de ubicación + capacidades + demanda + restricciones operacionales → modelo de optimización → rutas ejecutables</strong>, el mismo patrón que se usa en logística de última milla, distribución de combustible o, en este caso, cabotaje marítimo.</p>
 
 
 </section>
