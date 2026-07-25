@@ -19,6 +19,18 @@ Los secretos de cómo la probabilidad explica las coincidencias más asombrosas 
 [Leer artículo &rarr;](posts/coincidencias.html){.post-card-link}
 :::
 
+::: {.post-card}
+<span class="post-card-tag">Optimización &middot; Python</span>
+
+### [Ruteo semanal de una flota de barcos](posts/rutas-maritimas-chile.html)
+
+Cómo un algoritmo de optimización (Google OR-Tools) decide qué barco visita qué puerto cada semana, aplicado a una flota heterogénea y los principales puertos de Chile — con mapas interactivos de las rutas óptimas.
+
+<span class="post-card-meta"><i class="fa-regular fa-clock"></i> 10 min &nbsp;&middot;&nbsp; <i class="fa-solid fa-flask"></i> Contenido interactivo</span>
+
+[Leer artículo &rarr;](posts/rutas-maritimas-chile.html){.post-card-link}
+:::
+
 ::: {.post-card .post-card-placeholder}
 <span class="post-card-tag">Próximamente</span>
 
