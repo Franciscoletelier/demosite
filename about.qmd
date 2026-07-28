@@ -1,3 +1,24 @@
 ---
 title: "About me"
 ---
+
+# Francisco Letelier Castro
+
+## Resumen Profesional
+
+Ingeniero Comercial enfocado en Administración y Finanzas con más de 15 años de experiencia liderando operaciones, finanzas y contabilidad en empresas de logística de nivel nacional. Actualmente aportando valor estratégico mediante el uso de Data Science para optimizar la toma de decisiones ejecutivas.
+
+Buscando siempre ampliar mis conocimientos, y aplicando lo aprendido en la industria
+
+## Experiencia Académica
+
+-   *Universidad Diego Portales* *Profesor Asistente - Magíster en Negocios Digitales*
+    -   Curso: Ética y Protección de Datos, Marzo 2026 (Actual), Santiago, Chile
+    -   Curso: Business Analytics I. Marzo 2023 – Dic 2024, Santiago, Chile
+
+## Educación
+
+-   *Universidad Adolfo Ibañez*
+    -   Magíster Data Science, Chile, 2020 – 2023
+-   *Universidad Finis Terrae*
+    -   Ingeniería Comercial, Chile, 2012 – 2017

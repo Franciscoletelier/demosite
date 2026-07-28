@@ -82,5 +82,75 @@
     "title": "Ruteo semanal de una flota de barcos: los puertos de Chile",
     "section": "Conclusiones y límites del ejemplo",
     "text": "Conclusiones y límites del ejemplo\nEl algoritmo de OR-Tools resuelve en segundos un problema que, a mano, requeriría evaluar miles de combinaciones posibles de barcos y órdenes de visita. Algunas lecciones de esta iteración, y supuestos que valdría la pena relajar en un caso real:\n\nMinimizar costo no es lo mismo que minimizar distancia: con una flota heterogénea en precio, el objetivo correcto cambia la estructura de las rutas, no solo su magnitud.\nUn tope calculado como “promedio × factor” hay que validarlo contra el peor caso: un promedio puede esconder un destino extremo (como Iquique) que un tope naive dejaría inalcanzable, volviendo el problema entero infactible.\nEl Coeficiente de Span Global compara contra toda la flota, no solo contra las rutas activas: cuando sobran barcos, el “mínimo” de la comparación casi siempre es cero (barcos ociosos), así que el coeficiente termina presionando sobre todo a la ruta más larga — y subirlo demasiado puede comprar un balance marginal a un costo total desproporcionado.\nDistancia en línea recta: ignoramos corredores de navegación, corrientes y rutas costeras reales.\nSin ventanas de tiempo: no consideramos horarios de atraque, tiempos de carga/descarga ni disponibilidad de muelles.\nDemanda sintética y de una sola semana: en la práctica la demanda varía semana a semana y convendría planificar con un horizonte de varias semanas.\n\nAun con estas simplificaciones, el ejemplo muestra el patrón central de cualquier problema de ruteo aplicado: datos de ubicación + capacidades + demanda + restricciones operacionales → modelo de optimización → rutas ejecutables, el mismo patrón que se usa en logística de última milla, distribución de combustible o, en este caso, cabotaje marítimo."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About me",
+    "section": "",
+    "text": "Ingeniero Comercial enfocado en Administración y Finanzas con más de 15 años de experiencia liderando operaciones, finanzas y contabilidad en empresas de logística de nivel nacional. Actualmente aportando valor estratégico mediante el uso de Data Science para optimizar la toma de decisiones ejecutivas.\n\n\n\n\nUniversidad Diego Portales Profesor Asistente - Magíster en Negocios Digitales\n\nCurso: Etica y Protección de Datos, Marzo 2026 (Actual), Santiago, Chile\nCurso: Business Analytics I. Mar 2023 – Dic 2024, Santiago, Chile\n\n\n\n\n\n\nUniversidad Adolfo Ibañez\n\nMagíster Data Science, Chile, 2020 – 2023\n\nUniversidad Finis Terrae\n\nIngeniería Comercial, Chile, 2012 – 2017"
+  },
+  {
+    "objectID": "about.html#resumen-profesional",
+    "href": "about.html#resumen-profesional",
+    "title": "About me",
+    "section": "",
+    "text": "Ingeniero Comercial enfocado en Administración y Finanzas con más de 15 años de experiencia liderando operaciones, finanzas y contabilidad en empresas de logística de nivel nacional. Actualmente aportando valor estratégico mediante el uso de Data Science para optimizar la toma de decisiones ejecutivas."
+  },
+  {
+    "objectID": "about.html#experiencia-académica",
+    "href": "about.html#experiencia-académica",
+    "title": "About me",
+    "section": "",
+    "text": "Universidad Diego Portales Profesor Asistente - Magíster en Negocios Digitales\n\nCurso: Etica y Protección de Datos, Marzo 2026 (Actual), Santiago, Chile\nCurso: Business Analytics I. Mar 2023 – Dic 2024, Santiago, Chile"
+  },
+  {
+    "objectID": "CLAUDE.html",
+    "href": "CLAUDE.html",
+    "title": "CLAUDE.md",
+    "section": "",
+    "text": "This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.\n\n\nA Quarto website (project: type: website in _quarto.yml) published as franciscoletelier.github.io via GitHub Pages. It is a personal site with a landing page (index.qmd), an about page (about.qmd), and an article gallery (posts.qmd) linking to individual posts in posts/.\nGitHub Pages serves docs/ directly — there is no CI build step. Every change to .qmd source files must be rendered locally and the resulting docs/ output committed alongside the source.\n\n\n\n# Render the whole site (updates docs/) — run after any change to a .qmd file\nquarto render\n\n# Render a single post while iterating\nquarto render posts/&lt;name&gt;.qmd\n\n# Live-preview with auto-reload while writing\nquarto preview\n\n\nSome posts (e.g. posts/rutas-maritimas-chile.qmd) are real Quarto documents with {python} code cells executed via the Jupyter engine, not static HTML. macOS’s Homebrew Python is externally managed, so dependencies live in a project-local virtualenv:\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -r requirements.txt\n\n# Always activate the venv before rendering any post with Python code cells,\n# so Quarto's Jupyter engine picks up the right interpreter/kernel:\nsource .venv/bin/activate && quarto render posts/&lt;name&gt;.qmd\n\n# Sanity-check that Quarto can find Jupyter/the venv's Python:\nquarto check jupyter\n.venv/ is gitignored. requirements.txt is the source of truth for Python deps — update it (not just pip install) when a post needs a new package.\n\n\n\n\nPosts in posts/ follow one of two patterns — check which one before editing:\n\nHand-authored standalone HTML (e.g. posts/coincidencias.html): plain HTML with Tailwind CDN, Chart.js, KaTeX, etc. These bypass Quarto rendering entirely — they’re copied as-is into docs/posts/ via the resources: [posts/*.html] entry in _quarto.yml. They do not inherit the site’s navbar/footer/theme, so they hand-roll their own back-navigation bar (&lt;a href=\"../index.html\"&gt;Volver al sitio&lt;/a&gt; / &lt;a href=\"../posts.html\"&gt;Artículos&lt;/a&gt;).\nReal Quarto documents (.qmd, e.g. posts/rutas-maritimas-chile.qmd): executable Python notebooks rendered by Quarto’s Jupyter engine into docs/posts/&lt;name&gt;.html. These automatically inherit the site’s navbar, footer, and cosmo theme from _quarto.yml — no manual navigation markup needed. They typically use execute: freeze: auto in the front matter so Quarto reuses cached execution results (stored in _freeze/, which is committed to version control) instead of re-running Python/OR-Tools on every full-site render — this matters because there’s no CI, so _freeze/ is what lets the site be rebuilt without reinstalling the Python environment.\n\nWhen adding a new post: decide up front which pattern it needs. If it’s meant to show live-executed Python/data-analysis code, use the .qmd + Jupyter pattern and follow the structure of posts/rutas-maritimas-chile.qmd (front matter with code-fold: true, df-print: paged, freeze: auto).\n\n\n\nposts.qmd lists posts as .post-card divs inside a .posts-grid container. Duplicate an existing card (title as a markdown link to posts/&lt;name&gt;.html, a .post-card-tag, description, .post-card-meta line, and a .post-card-link) — there’s a placeholder “Próximamente” card at the end showing the pattern to copy. Link to the rendered .html output, not the .qmd source.\n\n\n\nstyles.css holds all custom CSS on top of Quarto’s cosmo Bootstrap theme (configured in _quarto.yml: format.html.theme: cosmo, custom font Inter via Google Fonts, FontAwesome icons). The site is light-themed only — there is no dark-mode toggle."
+  },
+  {
+    "objectID": "CLAUDE.html#what-this-is",
+    "href": "CLAUDE.html#what-this-is",
+    "title": "CLAUDE.md",
+    "section": "",
+    "text": "A Quarto website (project: type: website in _quarto.yml) published as franciscoletelier.github.io via GitHub Pages. It is a personal site with a landing page (index.qmd), an about page (about.qmd), and an article gallery (posts.qmd) linking to individual posts in posts/.\nGitHub Pages serves docs/ directly — there is no CI build step. Every change to .qmd source files must be rendered locally and the resulting docs/ output committed alongside the source."
+  },
+  {
+    "objectID": "CLAUDE.html#commands",
+    "href": "CLAUDE.html#commands",
+    "title": "CLAUDE.md",
+    "section": "",
+    "text": "# Render the whole site (updates docs/) — run after any change to a .qmd file\nquarto render\n\n# Render a single post while iterating\nquarto render posts/&lt;name&gt;.qmd\n\n# Live-preview with auto-reload while writing\nquarto preview\n\n\nSome posts (e.g. posts/rutas-maritimas-chile.qmd) are real Quarto documents with {python} code cells executed via the Jupyter engine, not static HTML. macOS’s Homebrew Python is externally managed, so dependencies live in a project-local virtualenv:\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -r requirements.txt\n\n# Always activate the venv before rendering any post with Python code cells,\n# so Quarto's Jupyter engine picks up the right interpreter/kernel:\nsource .venv/bin/activate && quarto render posts/&lt;name&gt;.qmd\n\n# Sanity-check that Quarto can find Jupyter/the venv's Python:\nquarto check jupyter\n.venv/ is gitignored. requirements.txt is the source of truth for Python deps — update it (not just pip install) when a post needs a new package."
+  },
+  {
+    "objectID": "CLAUDE.html#architecture-two-kinds-of-posts",
+    "href": "CLAUDE.html#architecture-two-kinds-of-posts",
+    "title": "CLAUDE.md",
+    "section": "",
+    "text": "Posts in posts/ follow one of two patterns — check which one before editing:\n\nHand-authored standalone HTML (e.g. posts/coincidencias.html): plain HTML with Tailwind CDN, Chart.js, KaTeX, etc. These bypass Quarto rendering entirely — they’re copied as-is into docs/posts/ via the resources: [posts/*.html] entry in _quarto.yml. They do not inherit the site’s navbar/footer/theme, so they hand-roll their own back-navigation bar (&lt;a href=\"../index.html\"&gt;Volver al sitio&lt;/a&gt; / &lt;a href=\"../posts.html\"&gt;Artículos&lt;/a&gt;).\nReal Quarto documents (.qmd, e.g. posts/rutas-maritimas-chile.qmd): executable Python notebooks rendered by Quarto’s Jupyter engine into docs/posts/&lt;name&gt;.html. These automatically inherit the site’s navbar, footer, and cosmo theme from _quarto.yml — no manual navigation markup needed. They typically use execute: freeze: auto in the front matter so Quarto reuses cached execution results (stored in _freeze/, which is committed to version control) instead of re-running Python/OR-Tools on every full-site render — this matters because there’s no CI, so _freeze/ is what lets the site be rebuilt without reinstalling the Python environment.\n\nWhen adding a new post: decide up front which pattern it needs. If it’s meant to show live-executed Python/data-analysis code, use the .qmd + Jupyter pattern and follow the structure of posts/rutas-maritimas-chile.qmd (front matter with code-fold: true, df-print: paged, freeze: auto)."
+  },
+  {
+    "objectID": "CLAUDE.html#adding-a-post-to-the-gallery",
+    "href": "CLAUDE.html#adding-a-post-to-the-gallery",
+    "title": "CLAUDE.md",
+    "section": "",
+    "text": "posts.qmd lists posts as .post-card divs inside a .posts-grid container. Duplicate an existing card (title as a markdown link to posts/&lt;name&gt;.html, a .post-card-tag, description, .post-card-meta line, and a .post-card-link) — there’s a placeholder “Próximamente” card at the end showing the pattern to copy. Link to the rendered .html output, not the .qmd source."
+  },
+  {
+    "objectID": "CLAUDE.html#styling",
+    "href": "CLAUDE.html#styling",
+    "title": "CLAUDE.md",
+    "section": "",
+    "text": "styles.css holds all custom CSS on top of Quarto’s cosmo Bootstrap theme (configured in _quarto.yml: format.html.theme: cosmo, custom font Inter via Google Fonts, FontAwesome icons). The site is light-themed only — there is no dark-mode toggle."
+  },
+  {
+    "objectID": "about.html#educación",
+    "href": "about.html#educación",
+    "title": "About me",
+    "section": "",
+    "text": "Universidad Adolfo Ibañez\n\nMagíster Data Science, Chile, 2020 – 2023\n\nUniversidad Finis Terrae\n\nIngeniería Comercial, Chile, 2012 – 2017"
   }
 ]

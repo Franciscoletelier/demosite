@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>About me – Francisco Letelier C</title>
+<title>claude – Francisco Letelier C</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -70,9 +104,11 @@ ul.task-list li input[type="checkbox"] {
 
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="About me – Francisco Letelier C">
+<meta property="og:title" content="Francisco Letelier C">
+<meta property="og:description" content="Ciencia de datos, estadística y visualización">
 <meta property="og:site_name" content="Francisco Letelier C">
-<meta name="twitter:title" content="About me – Francisco Letelier C">
+<meta name="twitter:title" content="Francisco Letelier C">
+<meta name="twitter:description" content="Ciencia de datos, estadística y visualización">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -102,7 +138,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Artículos</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./about.html" aria-current="page"> 
+    <a class="nav-link" href="./about.html"> 
 <span class="menu-text">Sobre mi</span></a>
   </li>  
 </ul>
@@ -133,65 +169,76 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#francisco-letelier-castro" id="toc-francisco-letelier-castro" class="nav-link active" data-scroll-target="#francisco-letelier-castro">Francisco Letelier Castro</a>
+  <li><a href="#claude.md" id="toc-claude.md" class="nav-link active" data-scroll-target="#claude.md">CLAUDE.md</a>
   <ul class="collapse">
-  <li><a href="#resumen-profesional" id="toc-resumen-profesional" class="nav-link" data-scroll-target="#resumen-profesional">Resumen Profesional</a></li>
-  <li><a href="#experiencia-académica" id="toc-experiencia-académica" class="nav-link" data-scroll-target="#experiencia-académica">Experiencia Académica</a></li>
-  <li><a href="#educación" id="toc-educación" class="nav-link" data-scroll-target="#educación">Educación</a></li>
+  <li><a href="#what-this-is" id="toc-what-this-is" class="nav-link" data-scroll-target="#what-this-is">What this is</a></li>
+  <li><a href="#commands" id="toc-commands" class="nav-link" data-scroll-target="#commands">Commands</a>
+  <ul class="collapse">
+  <li><a href="#python-environment-needed-for-posts-with-executable-python-code" id="toc-python-environment-needed-for-posts-with-executable-python-code" class="nav-link" data-scroll-target="#python-environment-needed-for-posts-with-executable-python-code">Python environment (needed for posts with executable Python code)</a></li>
+  </ul></li>
+  <li><a href="#architecture-two-kinds-of-posts" id="toc-architecture-two-kinds-of-posts" class="nav-link" data-scroll-target="#architecture-two-kinds-of-posts">Architecture: two kinds of posts</a></li>
+  <li><a href="#adding-a-post-to-the-gallery" id="toc-adding-a-post-to-the-gallery" class="nav-link" data-scroll-target="#adding-a-post-to-the-gallery">Adding a post to the gallery</a></li>
+  <li><a href="#styling" id="toc-styling" class="nav-link" data-scroll-target="#styling">Styling</a></li>
   </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">About me</h1>
-</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
-<div class="quarto-title-meta">
 
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<section id="francisco-letelier-castro" class="level1">
-<h1>Francisco Letelier Castro</h1>
-<section id="resumen-profesional" class="level2">
-<h2 class="anchored" data-anchor-id="resumen-profesional">Resumen Profesional</h2>
-<p>Ingeniero Comercial enfocado en Administración y Finanzas con más de 15 años de experiencia liderando operaciones, finanzas y contabilidad en empresas de logística de nivel nacional. Actualmente aportando valor estratégico mediante el uso de Data Science para optimizar la toma de decisiones ejecutivas.</p>
+<section id="claude.md" class="level1">
+<h1>CLAUDE.md</h1>
+<p>This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.</p>
+<section id="what-this-is" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-is">What this is</h2>
+<p>A <a href="https://quarto.org">Quarto</a> website (<code>project: type: website</code> in <code>_quarto.yml</code>) published as <code>franciscoletelier.github.io</code> via GitHub Pages. It is a personal site with a landing page (<code>index.qmd</code>), an about page (<code>about.qmd</code>), and an article gallery (<code>posts.qmd</code>) linking to individual posts in <code>posts/</code>.</p>
+<p><strong>GitHub Pages serves <code>docs/</code> directly</strong> — there is no CI build step. Every change to <code>.qmd</code> source files must be rendered locally and the resulting <code>docs/</code> output committed alongside the source.</p>
 </section>
-<section id="experiencia-académica" class="level2">
-<h2 class="anchored" data-anchor-id="experiencia-académica">Experiencia Académica</h2>
-<ul>
-<li><em>Universidad Diego Portales</em> <em>Profesor Asistente - Magíster en Negocios Digitales</em>
-<ul>
-<li>Curso: Etica y Protección de Datos, Marzo 2026 (Actual), Santiago, Chile</li>
-<li>Curso: Business Analytics I. Mar 2023 – Dic 2024, Santiago, Chile</li>
-</ul></li>
-</ul>
+<section id="commands" class="level2">
+<h2 class="anchored" data-anchor-id="commands">Commands</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Render the whole site (updates docs/) — run after any change to a .qmd file</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Render a single post while iterating</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render posts/<span class="op">&lt;</span>name<span class="op">&gt;</span>.qmd</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Live-preview with auto-reload while writing</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> preview</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="python-environment-needed-for-posts-with-executable-python-code" class="level3">
+<h3 class="anchored" data-anchor-id="python-environment-needed-for-posts-with-executable-python-code">Python environment (needed for posts with executable Python code)</h3>
+<p>Some posts (e.g.&nbsp;<code>posts/rutas-maritimas-chile.qmd</code>) are real Quarto documents with <code>{python}</code> code cells executed via the Jupyter engine, not static HTML. macOS’s Homebrew Python is externally managed, so dependencies live in a project-local virtualenv:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Always activate the venv before rendering any post with Python code cells,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># so Quarto's Jupyter engine picks up the right interpreter/kernel:</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate <span class="kw">&amp;&amp;</span> <span class="ex">quarto</span> render posts/<span class="op">&lt;</span>name<span class="op">&gt;</span>.qmd</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Sanity-check that Quarto can find Jupyter/the venv's Python:</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> check jupyter</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>.venv/</code> is gitignored. <code>requirements.txt</code> is the source of truth for Python deps — update it (not just <code>pip install</code>) when a post needs a new package.</p>
 </section>
-<section id="educación" class="level2">
-<h2 class="anchored" data-anchor-id="educación">Educación</h2>
-<ul>
-<li><em>Universidad Adolfo Ibañez</em>
-<ul>
-<li>Magíster Data Science, Chile, 2020 – 2023</li>
-</ul></li>
-<li><em>Universidad Finis Terrae</em>
-<ul>
-<li>Ingeniería Comercial, Chile, 2012 – 2017</li>
-</ul></li>
-</ul>
+</section>
+<section id="architecture-two-kinds-of-posts" class="level2">
+<h2 class="anchored" data-anchor-id="architecture-two-kinds-of-posts">Architecture: two kinds of posts</h2>
+<p>Posts in <code>posts/</code> follow one of two patterns — check which one before editing:</p>
+<ol type="1">
+<li><p><strong>Hand-authored standalone HTML</strong> (e.g.&nbsp;<code>posts/coincidencias.html</code>): plain HTML with Tailwind CDN, Chart.js, KaTeX, etc. These bypass Quarto rendering entirely — they’re copied as-is into <code>docs/posts/</code> via the <code>resources: [posts/*.html]</code> entry in <code>_quarto.yml</code>. They do <strong>not</strong> inherit the site’s navbar/footer/theme, so they hand-roll their own back-navigation bar (<code>&lt;a href="../index.html"&gt;Volver al sitio&lt;/a&gt;</code> / <code>&lt;a href="../posts.html"&gt;Artículos&lt;/a&gt;</code>).</p></li>
+<li><p><strong>Real Quarto documents</strong> (<code>.qmd</code>, e.g.&nbsp;<code>posts/rutas-maritimas-chile.qmd</code>): executable Python notebooks rendered by Quarto’s Jupyter engine into <code>docs/posts/&lt;name&gt;.html</code>. These automatically inherit the site’s navbar, footer, and <code>cosmo</code> theme from <code>_quarto.yml</code> — no manual navigation markup needed. They typically use <code>execute: freeze: auto</code> in the front matter so Quarto reuses cached execution results (stored in <code>_freeze/</code>, which <strong>is</strong> committed to version control) instead of re-running Python/OR-Tools on every full-site render — this matters because there’s no CI, so <code>_freeze/</code> is what lets the site be rebuilt without reinstalling the Python environment.</p></li>
+</ol>
+<p>When adding a new post: decide up front which pattern it needs. If it’s meant to show live-executed Python/data-analysis code, use the <code>.qmd</code> + Jupyter pattern and follow the structure of <code>posts/rutas-maritimas-chile.qmd</code> (front matter with <code>code-fold: true</code>, <code>df-print: paged</code>, <code>freeze: auto</code>).</p>
+</section>
+<section id="adding-a-post-to-the-gallery" class="level2">
+<h2 class="anchored" data-anchor-id="adding-a-post-to-the-gallery">Adding a post to the gallery</h2>
+<p><code>posts.qmd</code> lists posts as <code>.post-card</code> divs inside a <code>.posts-grid</code> container. Duplicate an existing card (title as a markdown link to <code>posts/&lt;name&gt;.html</code>, a <code>.post-card-tag</code>, description, <code>.post-card-meta</code> line, and a <code>.post-card-link</code>) — there’s a placeholder “Próximamente” card at the end showing the pattern to copy. Link to the <strong>rendered</strong> <code>.html</code> output, not the <code>.qmd</code> source.</p>
+</section>
+<section id="styling" class="level2">
+<h2 class="anchored" data-anchor-id="styling">Styling</h2>
+<p><code>styles.css</code> holds all custom CSS on top of Quarto’s <code>cosmo</code> Bootstrap theme (configured in <code>_quarto.yml</code>: <code>format.html.theme: cosmo</code>, custom font Inter via Google Fonts, FontAwesome icons). The site is light-themed only — there is no dark-mode toggle.</p>
 
 
 </section>
