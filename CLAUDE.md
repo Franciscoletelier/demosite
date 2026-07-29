@@ -6,7 +6,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A [Quarto](https://quarto.org) website (`project: type: website` in `_quarto.yml`) published as `franciscoletelier.github.io` via GitHub Pages. It is a personal site with a landing page (`index.qmd`), an about page (`about.qmd`), and an article gallery (`posts.qmd`) linking to individual posts in `posts/`.
 
-**GitHub Pages serves `docs/` directly** — there is no CI build step. Every change to `.qmd` source files must be rendered locally and the resulting `docs/` output committed alongside the source.
+**GitHub Pages serves `docs/` directly** — there is no CI build step. Every change to `.qmd` source files must be rendered locally with `quarto render` and the resulting `docs/` output committed alongside the source. The `docs/` directory is the published site; keep it in sync with the source.
+
+## Quick Start
+
+First time? Set up your environment:
+
+```bash
+# 1. Verify Quarto is installed
+quarto --version
+
+# 2. Create and activate Python virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 3. Install Python dependencies
+pip install -r requirements.txt
+
+# 4. Verify Jupyter setup
+quarto check jupyter
+```
+
+Then you're ready to develop. See **Commands** below for rendering and preview workflows.
 
 ## Commands
 
@@ -14,31 +35,29 @@ A [Quarto](https://quarto.org) website (`project: type: website` in `_quarto.yml
 # Render the whole site (updates docs/) — run after any change to a .qmd file
 quarto render
 
-# Render a single post while iterating
+# Render a single post while iterating (faster than full render)
 quarto render posts/<name>.qmd
 
 # Live-preview with auto-reload while writing
 quarto preview
+
+# After pulling changes: clean cache if renders fail unexpectedly
+rm -rf .quarto/
 ```
 
 ### Python environment (needed for posts with executable Python code)
 
-Some posts (e.g. `posts/rutas-maritimas-chile.qmd`) are real Quarto documents with `{python}` code cells executed via the Jupyter engine, not static HTML. macOS's Homebrew Python is externally managed, so dependencies live in a project-local virtualenv:
+Some posts (e.g. `posts/rutas-maritimas-chile.qmd`) are real Quarto documents with `{python}` code cells executed via the Jupyter engine. Dependencies live in a project-local virtualenv because macOS's Homebrew Python is externally managed.
+
+**Always activate the venv before rendering:**
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-
-# Always activate the venv before rendering any post with Python code cells,
-# so Quarto's Jupyter engine picks up the right interpreter/kernel:
 source .venv/bin/activate && quarto render posts/<name>.qmd
-
-# Sanity-check that Quarto can find Jupyter/the venv's Python:
-quarto check jupyter
 ```
 
-`.venv/` is gitignored. `requirements.txt` is the source of truth for Python deps — update it (not just `pip install`) when a post needs a new package.
+This ensures Quarto's Jupyter engine finds the right Python interpreter and installed packages.
+
+`.venv/` is gitignored. `requirements.txt` is the source of truth for Python deps — edit it (then re-run `pip install -r requirements.txt`) when a post needs a new package.
 
 ## Architecture: two kinds of posts
 
@@ -53,6 +72,15 @@ When adding a new post: decide up front which pattern it needs. If it's meant to
 ## Adding a post to the gallery
 
 `posts.qmd` lists posts as `.post-card` divs inside a `.posts-grid` container. Duplicate an existing card (title as a markdown link to `posts/<name>.html`, a `.post-card-tag`, description, `.post-card-meta` line, and a `.post-card-link`) — there's a placeholder "Próximamente" card at the end showing the pattern to copy. Link to the **rendered** `.html` output, not the `.qmd` source.
+
+## Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| `quarto render` fails with "Jupyter not found" or "Python not found" | Activate the venv: `source .venv/bin/activate` before running `quarto render` |
+| Python code cells don't execute / `.py` imports fail | Same as above — the venv must be active so Quarto's Jupyter engine finds the right Python |
+| `quarto render` produces unexpected output or caches stale results | Delete the cache: `rm -rf .quarto/` and try again |
+| Single post renders but full-site `quarto render` fails | The full render stops at the first error. Check the error message, fix that one post, and re-run |
 
 ## Styling
 
