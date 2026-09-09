@@ -5,38 +5,36 @@ page-layout: full
 toc: false
 ---
 
-::: {.posts-grid}
-
-::: {.post-card}
-<span class="post-card-tag">Estadística &middot; Interactivo</span>
+:::::: posts-grid
+::: post-card
+[Estadística · Interactivo]{.post-card-tag}
 
 ### [¿Destino o Estadística?](posts/coincidencias.html)
 
 Los secretos de cómo la probabilidad explica las coincidencias más asombrosas de nuestras vidas — con simulador de la paradoja de los cumpleaños, calculadora de azar y un experimento de percepción en vivo.
 
-<span class="post-card-meta"><i class="fa-regular fa-clock"></i> 8 min &nbsp;&middot;&nbsp; <i class="fa-solid fa-flask"></i> Contenido interactivo</span>
+[<i class="fa-regular fa-clock"></i> 8 min  ·  <i class="fa-solid fa-flask"></i> Contenido interactivo]{.post-card-meta}
 
-[Leer artículo &rarr;](posts/coincidencias.html){.post-card-link}
+[Leer artículo →](posts/coincidencias.html){.post-card-link}
 :::
 
-::: {.post-card}
-<span class="post-card-tag">Optimización &middot; Python</span>
+::: post-card
+[Optimización · Python]{.post-card-tag}
 
 ### [Ruteo semanal de una flota de barcos](posts/rutas-maritimas-chile.html)
 
 Cómo un algoritmo de optimización (Google OR-Tools) decide qué barco visita qué puerto cada semana, aplicado a una flota heterogénea y los principales puertos de Chile — con mapas interactivos de las rutas óptimas.
 
-<span class="post-card-meta"><i class="fa-regular fa-clock"></i> 10 min &nbsp;&middot;&nbsp; <i class="fa-solid fa-flask"></i> Contenido interactivo</span>
+[<i class="fa-regular fa-clock"></i> 10 min  ·  <i class="fa-solid fa-flask"></i> Contenido interactivo]{.post-card-meta}
 
-[Leer artículo &rarr;](posts/rutas-maritimas-chile.html){.post-card-link}
+[Leer artículo →](posts/rutas-maritimas-chile.html){.post-card-link}
 :::
 
 ::: {.post-card .post-card-placeholder}
-<span class="post-card-tag">Próximamente</span>
+[Próximamente]{.post-card-tag}
 
 ### Nuevo artículo
 
-Aquí aparecerá tu próximo post. Duplica una tarjeta como la de arriba y cambia el título, la descripción y el enlace.
+Comming soon
 :::
-
-:::
+::::::

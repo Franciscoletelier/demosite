@@ -172,12 +172,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#claude.md" id="toc-claude.md" class="nav-link active" data-scroll-target="#claude.md">CLAUDE.md</a>
   <ul class="collapse">
   <li><a href="#what-this-is" id="toc-what-this-is" class="nav-link" data-scroll-target="#what-this-is">What this is</a></li>
+  <li><a href="#quick-start" id="toc-quick-start" class="nav-link" data-scroll-target="#quick-start">Quick Start</a></li>
   <li><a href="#commands" id="toc-commands" class="nav-link" data-scroll-target="#commands">Commands</a>
   <ul class="collapse">
   <li><a href="#python-environment-needed-for-posts-with-executable-python-code" id="toc-python-environment-needed-for-posts-with-executable-python-code" class="nav-link" data-scroll-target="#python-environment-needed-for-posts-with-executable-python-code">Python environment (needed for posts with executable Python code)</a></li>
   </ul></li>
   <li><a href="#architecture-two-kinds-of-posts" id="toc-architecture-two-kinds-of-posts" class="nav-link" data-scroll-target="#architecture-two-kinds-of-posts">Architecture: two kinds of posts</a></li>
   <li><a href="#adding-a-post-to-the-gallery" id="toc-adding-a-post-to-the-gallery" class="nav-link" data-scroll-target="#adding-a-post-to-the-gallery">Adding a post to the gallery</a></li>
+  <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a></li>
   <li><a href="#styling" id="toc-styling" class="nav-link" data-scroll-target="#styling">Styling</a></li>
   </ul></li>
   </ul>
@@ -195,32 +197,45 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="what-this-is" class="level2">
 <h2 class="anchored" data-anchor-id="what-this-is">What this is</h2>
 <p>A <a href="https://quarto.org">Quarto</a> website (<code>project: type: website</code> in <code>_quarto.yml</code>) published as <code>franciscoletelier.github.io</code> via GitHub Pages. It is a personal site with a landing page (<code>index.qmd</code>), an about page (<code>about.qmd</code>), and an article gallery (<code>posts.qmd</code>) linking to individual posts in <code>posts/</code>.</p>
-<p><strong>GitHub Pages serves <code>docs/</code> directly</strong> — there is no CI build step. Every change to <code>.qmd</code> source files must be rendered locally and the resulting <code>docs/</code> output committed alongside the source.</p>
+<p><strong>GitHub Pages serves <code>docs/</code> directly</strong> — there is no CI build step. Every change to <code>.qmd</code> source files must be rendered locally with <code>quarto render</code> and the resulting <code>docs/</code> output committed alongside the source. The <code>docs/</code> directory is the published site; keep it in sync with the source.</p>
+</section>
+<section id="quick-start" class="level2">
+<h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
+<p>First time? Set up your environment:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Verify Quarto is installed</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> <span class="at">--version</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Create and activate Python virtual environment</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Install Python dependencies</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Verify Jupyter setup</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> check jupyter</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Then you’re ready to develop. See <strong>Commands</strong> below for rendering and preview workflows.</p>
 </section>
 <section id="commands" class="level2">
 <h2 class="anchored" data-anchor-id="commands">Commands</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Render the whole site (updates docs/) — run after any change to a .qmd file</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Render a single post while iterating</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render posts/<span class="op">&lt;</span>name<span class="op">&gt;</span>.qmd</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Live-preview with auto-reload while writing</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> preview</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Render the whole site (updates docs/) — run after any change to a .qmd file</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Render a single post while iterating (faster than full render)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render posts/<span class="op">&lt;</span>name<span class="op">&gt;</span>.qmd</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Live-preview with auto-reload while writing</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> preview</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># After pulling changes: clean cache if renders fail unexpectedly</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> .quarto/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <section id="python-environment-needed-for-posts-with-executable-python-code" class="level3">
 <h3 class="anchored" data-anchor-id="python-environment-needed-for-posts-with-executable-python-code">Python environment (needed for posts with executable Python code)</h3>
-<p>Some posts (e.g.&nbsp;<code>posts/rutas-maritimas-chile.qmd</code>) are real Quarto documents with <code>{python}</code> code cells executed via the Jupyter engine, not static HTML. macOS’s Homebrew Python is externally managed, so dependencies live in a project-local virtualenv:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Always activate the venv before rendering any post with Python code cells,</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># so Quarto's Jupyter engine picks up the right interpreter/kernel:</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate <span class="kw">&amp;&amp;</span> <span class="ex">quarto</span> render posts/<span class="op">&lt;</span>name<span class="op">&gt;</span>.qmd</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Sanity-check that Quarto can find Jupyter/the venv's Python:</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> check jupyter</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><code>.venv/</code> is gitignored. <code>requirements.txt</code> is the source of truth for Python deps — update it (not just <code>pip install</code>) when a post needs a new package.</p>
+<p>Some posts (e.g.&nbsp;<code>posts/rutas-maritimas-chile.qmd</code>) are real Quarto documents with <code>{python}</code> code cells executed via the Jupyter engine. Dependencies live in a project-local virtualenv because macOS’s Homebrew Python is externally managed.</p>
+<p><strong>Always activate the venv before rendering:</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate <span class="kw">&amp;&amp;</span> <span class="ex">quarto</span> render posts/<span class="op">&lt;</span>name<span class="op">&gt;</span>.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This ensures Quarto’s Jupyter engine finds the right Python interpreter and installed packages.</p>
+<p><code>.venv/</code> is gitignored. <code>requirements.txt</code> is the source of truth for Python deps — edit it (then re-run <code>pip install -r requirements.txt</code>) when a post needs a new package.</p>
 </section>
 </section>
 <section id="architecture-two-kinds-of-posts" class="level2">
@@ -235,6 +250,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="adding-a-post-to-the-gallery" class="level2">
 <h2 class="anchored" data-anchor-id="adding-a-post-to-the-gallery">Adding a post to the gallery</h2>
 <p><code>posts.qmd</code> lists posts as <code>.post-card</code> divs inside a <code>.posts-grid</code> container. Duplicate an existing card (title as a markdown link to <code>posts/&lt;name&gt;.html</code>, a <code>.post-card-tag</code>, description, <code>.post-card-meta</code> line, and a <code>.post-card-link</code>) — there’s a placeholder “Próximamente” card at the end showing the pattern to copy. Link to the <strong>rendered</strong> <code>.html</code> output, not the <code>.qmd</code> source.</p>
+</section>
+<section id="troubleshooting" class="level2">
+<h2 class="anchored" data-anchor-id="troubleshooting">Troubleshooting</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Problem</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>quarto render</code> fails with “Jupyter not found” or “Python not found”</td>
+<td>Activate the venv: <code>source .venv/bin/activate</code> before running <code>quarto render</code></td>
+</tr>
+<tr class="even">
+<td>Python code cells don’t execute / <code>.py</code> imports fail</td>
+<td>Same as above — the venv must be active so Quarto’s Jupyter engine finds the right Python</td>
+</tr>
+<tr class="odd">
+<td><code>quarto render</code> produces unexpected output or caches stale results</td>
+<td>Delete the cache: <code>rm -rf .quarto/</code> and try again</td>
+</tr>
+<tr class="even">
+<td>Single post renders but full-site <code>quarto render</code> fails</td>
+<td>The full render stops at the first error. Check the error message, fix that one post, and re-run</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="styling" class="level2">
 <h2 class="anchored" data-anchor-id="styling">Styling</h2>
