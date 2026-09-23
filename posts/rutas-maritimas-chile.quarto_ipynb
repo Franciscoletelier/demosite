@@ -42,7 +42,7 @@
         "\n",
         "Partimos de las coordenadas de los seis principales puertos de Chile:\n"
       ],
-      "id": "2240a98b"
+      "id": "32218780"
     },
     {
       "cell_type": "code",
@@ -91,7 +91,7 @@
         "df = pd.DataFrame(puertos_chile)\n",
         "df"
       ],
-      "id": "ac80732d",
+      "id": "77a459f2",
       "execution_count": null,
       "outputs": []
     },
@@ -101,7 +101,7 @@
       "source": [
         "Usaremos el **Puerto de Valparaíso** como puerto base (*depot*): ahí parten y regresan todos los barcos cada semana.\n"
       ],
-      "id": "9fff9e00"
+      "id": "d4967b1f"
     },
     {
       "cell_type": "code",
@@ -115,7 +115,7 @@
         "flota[\"Capacidad_total_ton\"] = flota[\"Capacidad_ton\"] * flota[\"Cantidad_barcos\"]\n",
         "flota"
       ],
-      "id": "cf568a0d",
+      "id": "bb614fb3",
       "execution_count": null,
       "outputs": []
     },
@@ -139,7 +139,7 @@
         "fig_mapa.update_layout(height=550, margin=dict(l=0, r=0, t=50, b=0))\n",
         "fig_mapa.show()"
       ],
-      "id": "7b36c970",
+      "id": "5e74d7c6",
       "execution_count": null,
       "outputs": []
     },
@@ -151,7 +151,7 @@
         "\n",
         "No tenemos datos reales de toneladas a transportar por puerto, así que generamos una **demanda sintética** con una semilla fija (para que el ejemplo sea reproducible). Acotamos la demanda de cada puerto entre 15 y 70 toneladas — siempre por debajo de la capacidad máxima de un barco tipo C (90 ton) — para que cada puerto pueda ser abastecido por un solo barco, sin necesidad de dividir la entrega.\n"
       ],
-      "id": "d36be00e"
+      "id": "612725af"
     },
     {
       "cell_type": "code",
@@ -164,7 +164,7 @@
         "\n",
         "puertos_demanda[[\"Puerto\", \"Region\", \"Demanda_ton\"]]"
       ],
-      "id": "652106f5",
+      "id": "2a532cf4",
       "execution_count": null,
       "outputs": []
     },
@@ -179,7 +179,7 @@
         "print(f\"Capacidad total de la flota: {capacidad_total} toneladas\")\n",
         "print(f\"La flota completa nunca es necesaria: sobra capacidad de sobra incluso usando pocos barcos grandes.\")"
       ],
-      "id": "f888637d",
+      "id": "086e7670",
       "execution_count": null,
       "outputs": []
     },
@@ -191,7 +191,7 @@
         "\n",
         "Como solo contamos con las coordenadas de los puertos (no rutas de navegación reales), aproximamos la distancia entre cada par de puertos con la **fórmula de Haversine**, que calcula la distancia en línea recta sobre la superficie de la Tierra a partir de latitud y longitud. Es una simplificación razonable para un ejemplo didáctico: en la práctica, un barco real seguiría corredores de navegación y no una línea recta.\n"
       ],
-      "id": "7e60d946"
+      "id": "33b08a85"
     },
     {
       "cell_type": "code",
@@ -227,7 +227,7 @@
         "    index=nodos[\"Puerto\"], columns=nodos[\"Puerto\"]\n",
         ")"
       ],
-      "id": "f6628c39",
+      "id": "886fa9bc",
       "execution_count": null,
       "outputs": []
     },
@@ -239,7 +239,7 @@
         "\n",
         "Hasta aquí el modelo trataría un kilómetro recorrido por cualquier barco como igual de \"caro\". En la práctica no es así: un barco tipo C (90 ton) cuesta mucho más operar por kilómetro que uno tipo A (25 ton) — más tripulación, más combustible, más mantención. Incorporamos un costo de operación distinto por tipo de barco (en pesos chilenos, CLP, por kilómetro) y **cambiamos el objetivo del modelo: en vez de minimizar distancia, minimizamos el costo total de la semana**.\n"
       ],
-      "id": "2cbb9c3c"
+      "id": "f8c96124"
     },
     {
       "cell_type": "code",
@@ -251,7 +251,7 @@
         "costos_tabla[\"Costo_por_km_CLP\"] = costos_tabla[\"Capacidad_ton\"].map(costo_por_km)\n",
         "costos_tabla"
       ],
-      "id": "bb76e680",
+      "id": "377e44bc",
       "execution_count": null,
       "outputs": []
     },
@@ -272,7 +272,7 @@
         "\n",
         "Empaquetamos la construcción y la extracción de resultados en dos funciones, porque las vamos a reutilizar varias veces con distintas configuraciones a lo largo del post.\n"
       ],
-      "id": "e194c0c6"
+      "id": "d19a8954"
     },
     {
       "cell_type": "code",
@@ -392,7 +392,7 @@
         "        ]\n",
         "    })"
       ],
-      "id": "d1799032",
+      "id": "da8dc723",
       "execution_count": null,
       "outputs": []
     },
@@ -402,7 +402,7 @@
       "source": [
         "### Fase 1: minimizar el costo total de la flota\n"
       ],
-      "id": "82495aeb"
+      "id": "fbaf8d7c"
     },
     {
       "cell_type": "code",
@@ -412,7 +412,7 @@
         "rutas_df_f1, rutas_f1 = extraer_rutas(manager_f1, routing_f1, solution_f1)\n",
         "formatear_tabla(rutas_df_f1)"
       ],
-      "id": "8953dcb5",
+      "id": "119b8b12",
       "execution_count": null,
       "outputs": []
     },
@@ -422,7 +422,7 @@
       "source": [
         "resumen_modelo(rutas_df_f1)"
       ],
-      "id": "2dcae0a4",
+      "id": "d68b6968",
       "execution_count": null,
       "outputs": []
     },
@@ -432,7 +432,7 @@
       "source": [
         "La estructura de rutas cambia frente al modelo que solo miraba distancia: cuando cada barco tiene su propio costo por km, al algoritmo le puede convenir usar **más barcos pequeños y baratos** en vez de consolidar todo en pocos barcos grandes, aunque eso signifique recorrer más kilómetros en total. Lo confirmamos comparando contra la solución que solo minimizaba distancia (la del modelo original), evaluada con los precios reales:\n"
       ],
-      "id": "0062a333"
+      "id": "85d1a4f2"
     },
     {
       "cell_type": "code",
@@ -450,7 +450,7 @@
         "comparacion_objetivo[\"Costo_total_CLP\"] = comparacion_objetivo[\"Costo_total_CLP\"].map(lambda x: f\"${x:,.0f}\")\n",
         "comparacion_objetivo"
       ],
-      "id": "d66bbec6",
+      "id": "5e1dc00b",
       "execution_count": null,
       "outputs": []
     },
@@ -466,7 +466,7 @@
         "\n",
         "Definimos ese límite como **1,5 veces la distancia promedio esperada por ruta** — usamos la distancia promedio de las rutas de la Fase 1 como estimador de esa \"carga de trabajo\" esperada por barco:\n"
       ],
-      "id": "56a853cc"
+      "id": "13b0f115"
     },
     {
       "cell_type": "code",
@@ -478,7 +478,7 @@
         "print(f\"Distancia promedio esperada por ruta (Fase 1): {distancia_promedio_ruta:.1f} km\")\n",
         "print(f\"Tope propuesto (1.5x el promedio): {tope_naive_km:.1f} km\")"
       ],
-      "id": "d5f88452",
+      "id": "94d666d2",
       "execution_count": null,
       "outputs": []
     },
@@ -489,7 +489,7 @@
         "manager_f2, routing_f2, solution_f2 = construir_modelo(usar_costo_por_tipo=True, tope_distancia_km=tope_naive_km)\n",
         "print(\"Resultado con el tope naive:\", \"solución encontrada\" if solution_f2 else \"INFACTIBLE — el solver no encuentra ninguna asignación válida\")"
       ],
-      "id": "54a50c0a",
+      "id": "7685b128",
       "execution_count": null,
       "outputs": []
     },
@@ -499,7 +499,7 @@
       "source": [
         "El modelo **queda infactible**. La razón no es un error de código: ningún barco puede visitar Puerto de Iquique sin superar el tope, porque el solo viaje de ida y vuelta a Iquique ya excede el límite que calculamos.\n"
       ],
-      "id": "9d195781"
+      "id": "b3b90e48"
     },
     {
       "cell_type": "code",
@@ -511,7 +511,7 @@
         "}).sort_values(\"Ida_vuelta_km\", ascending=False).reset_index(drop=True)\n",
         "ida_vuelta_por_puerto"
       ],
-      "id": "584349f9",
+      "id": "4261f4d4",
       "execution_count": null,
       "outputs": []
     },
@@ -521,7 +521,7 @@
       "source": [
         "Esta es una lección importante al fijar un tope: **un promedio no protege contra un caso extremo**. Iquique está mucho más lejos que el resto (casi el doble de la distancia promedio), así que cualquier tope calculado como \"1,5x el promedio\" corre el riesgo de excluir justamente al puerto más alejado — dejándolo, en la práctica, sin ninguna forma de ser atendido. Antes de fijar un tope hay que validarlo contra el peor caso, no solo contra el promedio:\n"
       ],
-      "id": "aa695c01"
+      "id": "9a839722"
     },
     {
       "cell_type": "code",
@@ -530,7 +530,7 @@
         "tope_final_km = round(ida_vuelta_por_puerto[\"Ida_vuelta_km\"].max() * 1.2, -2)  # 20% de margen sobre el puerto más lejano\n",
         "print(f\"Tope corregido (ida y vuelta al puerto más lejano + 20% de margen): {tope_final_km:.0f} km\")"
       ],
-      "id": "dc5405f0",
+      "id": "1b0f8e22",
       "execution_count": null,
       "outputs": []
     },
@@ -543,7 +543,7 @@
         "print(\"Resultado con el tope corregido:\", \"solución encontrada\" if solution_f2b else \"INFACTIBLE\")\n",
         "formatear_tabla(rutas_df_f2b)"
       ],
-      "id": "22adb473",
+      "id": "0a65670f",
       "execution_count": null,
       "outputs": []
     },
@@ -567,7 +567,7 @@
         "\n",
         "Para ver el efecto de forma clara, lo probamos en el modelo simple (solo distancia, sin diferenciar costo por tipo de barco), donde el algoritmo sí tiene margen real para reestructurar rutas:\n"
       ],
-      "id": "a0b7b696"
+      "id": "371562ec"
     },
     {
       "cell_type": "code",
@@ -589,7 +589,7 @@
         "df_sweep = pd.DataFrame(resultados_sweep)\n",
         "df_sweep"
       ],
-      "id": "6e207d92",
+      "id": "29cf6cca",
       "execution_count": null,
       "outputs": []
     },
@@ -620,7 +620,7 @@
         "fig_sweep.update_yaxes(gridcolor=\"#e1e0d9\")\n",
         "fig_sweep.show()"
       ],
-      "id": "d0cdcac2",
+      "id": "898a7bb1",
       "execution_count": null,
       "outputs": []
     },
@@ -634,7 +634,7 @@
         "\n",
         "Aplicamos las tres mejoras juntas: costo real por tipo de barco, el tope de distancia corregido, y un Coeficiente de Span Global moderado.\n"
       ],
-      "id": "318ef30c"
+      "id": "d3ad6486"
     },
     {
       "cell_type": "code",
@@ -648,7 +648,7 @@
         "rutas_df_f3, rutas_f3 = extraer_rutas(manager_f3, routing_f3, solution_f3)\n",
         "formatear_tabla(rutas_df_f3)"
       ],
-      "id": "ca9ae5b7",
+      "id": "ce0144ae",
       "execution_count": null,
       "outputs": []
     },
@@ -658,7 +658,7 @@
       "source": [
         "resumen_modelo(rutas_df_f3)"
       ],
-      "id": "dcdc029f",
+      "id": "c1248079",
       "execution_count": null,
       "outputs": []
     },
@@ -670,7 +670,7 @@
         "\n",
         "Por último, visualizamos las rutas finales sobre el mapa:\n"
       ],
-      "id": "afec9eca"
+      "id": "8ef4fc45"
     },
     {
       "cell_type": "code",
@@ -705,7 +705,7 @@
         ")\n",
         "fig_rutas.show()"
       ],
-      "id": "1a90e48d",
+      "id": "33b02f78",
       "execution_count": null,
       "outputs": []
     },
@@ -726,7 +726,7 @@
         "\n",
         "Aun con estas simplificaciones, el ejemplo muestra el patrón central de cualquier problema de ruteo aplicado: **datos de ubicación + capacidades + demanda + restricciones operacionales → modelo de optimización → rutas ejecutables**, el mismo patrón que se usa en logística de última milla, distribución de combustible o, en este caso, cabotaje marítimo."
       ],
-      "id": "99ec0a93"
+      "id": "d6b431c3"
     }
   ],
   "metadata": {

@@ -12,13 +12,13 @@ Buscando siempre ampliar mis conocimientos, y aplicando lo aprendido en la indus
 
 ## Experiencia Académica
 
--   *Universidad Diego Portales* *Profesor Asistente - Magíster en Negocios Digitales*
-    -   Curso: Ética y Protección de Datos, Marzo 2026 (Actual), Santiago, Chile
-    -   Curso: Business Analytics I. Marzo 2023 – Dic 2024, Santiago, Chile
+- *Universidad Diego Portales* *Profesor Asistente - Magíster en Negocios Digitales*
+  - Curso: Ética y Protección de Datos, Marzo 2026 (Actual), Santiago, Chile
+  - Curso: Business Analytics I. Marzo 2023 – Dic 2024, Santiago, Chile
 
 ## Educación
 
--   *Universidad Adolfo Ibañez*
-    -   Magíster Data Science, Chile, 2020 – 2023
--   *Universidad Finis Terrae*
-    -   Ingeniería Comercial, Chile, 2012 – 2017
+- *Universidad Adolfo Ibañez*
+  - Magíster Data Science, Chile, 2020 – 2023
+- *Universidad Finis Terrae*
+  - Ingeniería Comercial, Chile, 2012 – 2017
