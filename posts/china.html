@@ -1,1378 +1,367 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Historia Económica de China: Del Apogeo al Rezago y la Recuperación (960–2010s)</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Georgia', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f4f9',
+                            100: '#dfe8f5',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e293b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --ink: #17231f;
-            --paper: #f4f1e9;
-            --muted: #65716b;
-            --jade: #315f50;
-            --rust: #a44c32;
-            --gold: #c49a52;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            color: var(--ink);
-            background-color: var(--paper);
-            line-height: 1.6;
-        }
-
-        .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background-color: rgba(244, 241, 233, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(23, 35, 31, 0.1);
-        }
-
-        .hero {
-            background: linear-gradient(135deg, var(--jade) 0%, var(--ink) 100%);
-            color: var(--paper);
-            padding: 6rem 2rem;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        .hero .subtitle {
-            font-size: 1.25rem;
-            color: rgba(244, 241, 233, 0.85);
-            margin-bottom: 2rem;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .hero .cta {
-            display: inline-block;
-            padding: 0.75rem 2rem;
-            background-color: var(--gold);
-            color: var(--ink);
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 600;
-            transition: background-color 0.3s;
-        }
-
-        .hero .cta:hover {
-            background-color: var(--rust);
-            color: var(--paper);
-        }
-
-        section {
-            padding: 4rem 2rem;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--jade);
-            margin-bottom: 2rem;
-            border-bottom: 3px solid var(--gold);
-            padding-bottom: 1rem;
-        }
-
-        .subsection-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--rust);
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .thesis-box {
-            background-color: rgba(49, 95, 80, 0.08);
-            border-left: 5px solid var(--jade);
-            padding: 2rem;
-            margin: 2rem 0;
-            border-radius: 4px;
-        }
-
-        .timeline {
-            margin: 2rem 0;
-        }
-
-        .timeline-item {
-            margin-bottom: 2.5rem;
-            padding-left: 2rem;
-            border-left: 3px solid var(--gold);
-            position: relative;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -8px;
-            top: 0;
-            width: 12px;
-            height: 12px;
-            background-color: var(--jade);
-            border-radius: 50%;
-            border: 3px solid var(--paper);
-        }
-
-        .timeline-item h4 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--jade);
-            margin-bottom: 0.5rem;
-        }
-
-        .timeline-item .period {
-            font-size: 0.95rem;
-            color: var(--muted);
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin: 2.5rem 0;
-            background-color: rgba(255, 255, 255, 0.5);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid rgba(49, 95, 80, 0.1);
-        }
-
-        .chart-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--ink);
-            margin-bottom: 1rem;
-        }
-
-        .chart-note {
-            font-size: 0.85rem;
-            color: var(--muted);
-            margin-top: 0.75rem;
-            font-style: italic;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 2rem 0;
-            font-size: 0.95rem;
-        }
-
-        .data-table th {
-            background-color: var(--jade);
-            color: var(--paper);
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .data-table td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid rgba(49, 95, 80, 0.1);
-        }
-
-        .data-table tr:nth-child(even) {
-            background-color: rgba(49, 95, 80, 0.03);
-        }
-
-        .comparison-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .metric-card {
-            background-color: var(--paper);
-            border: 1px solid rgba(49, 95, 80, 0.15);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border-top: 4px solid var(--jade);
-        }
-
-        .metric-card h5 {
-            font-size: 0.95rem;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .metric-card .value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--jade);
-        }
-
-        .metric-card .unit {
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
-
-        .callout {
-            background-color: rgba(164, 76, 50, 0.08);
-            border-left: 5px solid var(--rust);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 4px;
-        }
-
-        .callout strong {
-            color: var(--rust);
-        }
-
-        footer {
-            background-color: var(--ink);
-            color: var(--paper);
-            text-align: center;
-            padding: 2rem;
-            font-size: 0.9rem;
-            margin-top: 4rem;
-        }
-
-        footer a {
-            color: var(--gold);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 2rem;
-            padding: 0.75rem 1.5rem;
-            background-color: var(--muted);
-            color: var(--paper);
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 0.95rem;
-            transition: background-color 0.3s;
-        }
-
-        .back-link:hover {
-            background-color: var(--jade);
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .section-title {
-                font-size: 1.75rem;
-            }
-
-            .chart-container {
-                height: 300px;
-            }
-
-            section {
-                padding: 2rem 1rem;
-            }
-        }
-    </style>
 </head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="../index.html" class="text-lg font-bold text-jade hover:text-rust transition-colors">
-                <i class="fas fa-home mr-2"></i>Volver al sitio
-            </a>
-            <a href="../posts.html" class="text-jade hover:text-rust transition-colors font-medium">
-                <i class="fas fa-newspaper mr-2"></i>Artículos
-            </a>
-        </div>
-    </nav>
+<body class="bg-[#fafafa] text-slate-800 font-sans antialiased selection:bg-blue-100 selection:text-blue-900">
 
-    <!-- Hero Section -->
-    <div class="hero">
-        <h1>La Historia Económica de China</h1>
-        <p class="subtitle">Del Apogeo Imperial al Rezago Moderno y la Recuperación (960–2010s)</p>
-        <p class="text-lg">Una investigación cuantitativa basada en <em>Brandt, Ma & Rawski (2014)</em></p>
+    <!-- Back navigation bar -->
+    <div class="bg-slate-900 text-slate-300 text-xs">
+        <div class="max-w-6xl mx-auto px-4 h-9 flex items-center">
+            <a href="../index.html" class="flex items-center gap-1.5 hover:text-white transition-colors font-semibold">
+                <i class="fa-solid fa-arrow-left"></i> Volver al sitio
+            </a>
+            <span class="mx-2 text-slate-600">/</span>
+            <a href="../posts.html" class="hover:text-white transition-colors">Artículos</a>
+        </div>
     </div>
 
-    <!-- Thesis Section -->
-    <section>
-        <h2 class="section-title">La Pregunta Central</h2>
+    <!-- Sticky Header -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-9 h-9 rounded-lg flex items-center justify-center font-bold text-lg shadow-md shadow-blue-200">
+                    <i class="fa-solid fa-landmark text-sm"></i>
+                </span>
+                <span class="font-bold text-slate-800 tracking-tight text-lg">Asistente Editor <span class="text-blue-600">|</span> Historia Económica</span>
+            </div>
+            <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-600">
+                <a href="#articulo" class="hover:text-blue-600 transition-colors">Pregunta Central</a>
+                <a href="#cronologia" class="hover:text-blue-600 transition-colors">Cronología</a>
+                <a href="#evidencia" class="hover:text-blue-600 transition-colors">Evidencia Cuantitativa</a>
+                <a href="#instituciones" class="hover:text-blue-600 transition-colors">Instituciones</a>
+                <a href="#referencias" class="hover:text-blue-600 transition-colors">Referencias</a>
+            </nav>
+            <div class="flex items-center">
+                <a href="#articulo" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-full transition-all hover:shadow-lg hover:shadow-blue-200">
+                    Leer Artículo
+                </a>
+            </div>
+        </div>
+    </header>
 
-        <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">
-            ¿Por qué una civilización que representaba <strong>una tercera parte de la economía mundial</strong> en 1820
-            se convirtió en un jugador marginal en 1973, antes de experimentar una de las transformaciones económicas
-            más rápidas de la historia?
-        </p>
+    <!-- Hero Section -->
+    <main class="relative overflow-hidden bg-gradient-to-b from-blue-50/50 via-white to-white py-12 md:py-20">
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-6">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>Historia Económica · Instituciones Políticas
+            </span>
+            <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight md:leading-none mb-6">
+                De la Divergencia a la Convergencia
+            </h1>
+            <p class="text-xl md:text-2xl font-light text-slate-500 max-w-2xl mx-auto leading-relaxed mb-8">
+                La historia económica de China (960–2010s): cómo las instituciones explicar tanto su apogeo como su rezago y recuperación.
+            </p>
+            <div class="flex items-center justify-center space-x-4 mb-10">
+                <div class="flex -space-x-2">
+                    <span class="w-10 h-10 rounded-full border-2 border-white bg-blue-600 text-white flex items-center justify-center font-bold text-xs">LB</span>
+                    <span class="w-10 h-10 rounded-full border-2 border-white bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">DM</span>
+                    <span class="w-10 h-10 rounded-full border-2 border-white bg-blue-500 text-white flex items-center justify-center font-bold text-xs">TR</span>
+                </div>
+                <div class="text-left text-xs text-slate-500">
+                    <p class="font-bold text-slate-700 text-sm">Basado en Brandt, Ma & Rawski (2014)</p>
+                    <p>*Journal of Economic Literature*, 52(1), 45–123</p>
+                </div>
+            </div>
 
-        <div class="thesis-box">
-            <h3 style="font-size: 1.25rem; color: var(--jade); margin-bottom: 1rem;">Tesis: Instituciones y Trayectorias de Largo Plazo</h3>
+            <div class="border-t border-b border-slate-100 py-4 flex flex-wrap gap-6 justify-center text-xs font-medium text-slate-500">
+                <span><i class="fa-regular fa-clock mr-1"></i> Lectura de 15 min</span>
+                <span><i class="fa-solid fa-chart-bar mr-1"></i> Datos Validados</span>
+                <span><i class="fa-solid fa-graduation-cap mr-1"></i> Rigor Académico</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Main Content -->
+    <section id="articulo" class="max-w-3xl mx-auto px-4 pb-16">
+        <article class="prose prose-slate max-w-none text-slate-700 leading-relaxed font-serif text-lg md:text-xl space-y-6">
+
+            <h2 class="font-sans font-extrabold text-3xl md:text-4xl text-slate-900 tracking-tight pt-4 text-blue-900">La Pregunta Central</h2>
+
+            <p class="first-letter:text-5xl first-letter:font-extrabold first-letter:text-blue-600 first-letter:mr-3 first-letter:float-left">
+                ¿Por qué una civilización que representaba una tercera parte de la economía mundial en 1820 se convirtió en un jugador marginal en 1973, antes de experimentar una de las transformaciones económicas más rápidas de la historia?
+            </p>
+
+            <div class="my-8 p-6 bg-blue-50/50 border-l-4 border-blue-600 rounded-r-xl font-sans not-italic text-sm md:text-base text-slate-800">
+                <p class="font-bold text-blue-800 text-lg mb-2"><i class="fa-solid fa-lightbulb mr-2 opacity-50"></i>Tesis Central</p>
+                El destino económico de China no fue determinado por geografía, cultura o recursos naturales, sino por <strong>instituciones políticas</strong>. Las dinastías Song-Qing construyeron un Estado centralizado altamente efectivo que permitió crecimiento extensivo (más personas, más tierra) pero sofocó el crecimiento intensivo (innovación y productividad). Entre 1820 y 1973, esta rigidez institucional —combinada con guerras, colonialismo e revolución— produjo estancamiento relativo. Las reformas post-1978 invirtieron esta lógica, permitiendo innovación descentralizada dentro de una estructura estatal fuerte.
+            </div>
+
+            <h2 class="font-sans font-extrabold text-2xl md:text-3xl text-slate-900 tracking-tight pt-4">Seis Períodos de la Historia Económica China</h2>
+
+            <div id="cronologia" class="space-y-8 my-8">
+
+                <div class="p-6 bg-white border-l-4 border-blue-600 rounded-r-lg shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-slate-900 text-xl mb-1">Período 1: La Dinastía Song (960–1279)</h3>
+                    <p class="text-slate-600 text-sm mb-3"><i class="fa-solid fa-crown mr-1"></i> El Apogeo Institucional</p>
+                    <p class="text-slate-700">La dinastía Song perfecciona el aparato burocrático centralizado y basado en méritos. China desarrolla técnicas avanzadas: registros precisos de impuestos, estandarización de unidades, redistribución de recursos entre provincias. <strong>Tabla 2</strong> muestra que en Song (1085), la carga impositiva per capita es de <strong>0.80 shi/persona</strong> (índice 100). China representa el <strong>22.7% del PIB mundial</strong> en el año 1000 con apenas el 22% de la población.</p>
+                </div>
+
+                <div class="p-6 bg-white border-l-4 border-indigo-600 rounded-r-lg shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-slate-900 text-xl mb-1">Período 2: Ming–Qing Temprano (1368–1800)</h3>
+                    <p class="text-slate-600 text-sm mb-3"><i class="fa-solid fa-lock mr-1"></i> Rigidez Institucional e Inercia Fiscal</p>
+                    <p class="text-slate-700">El Estado chino se vuelve progresivamente más restrictivo. Se cierran puertos, se endurece la ideología confuciana ortodoxa. La fiscalidad desciende dramáticamente: en Ming (1577), cae a <strong>0.24 shi/persona</strong> (índice 30). <strong>Tabla 3</strong> revela la paradoja: en 1700–49, China recauda <strong>1,304 toneladas de plata</strong> (vs 932 Francia), pero con ~150 millones de personas, es solo <strong>8.6 gramos per capita</strong> (vs 46.6 Francia). China es fiscalmente débil relativamente a su tamaño.</p>
+                </div>
+
+                <div class="p-6 bg-white border-l-4 border-sky-600 rounded-r-lg shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-slate-900 text-xl mb-1">Período 3: Qing Tardío (1800–1911)</h3>
+                    <p class="text-slate-600 text-sm mb-3"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Crisis Institucional y Colapso Relativo</p>
+                    <p class="text-slate-700"><strong>Tabla 1</strong> muestra el colapso: en 1820, China era el 32.9% del PIB mundial; en 1913, solo 8.9%. La carga fiscal per capita alcanza mínimos históricos: <strong>0.12 shi/persona</strong> (índice 15). El gobierno central pierde capacidad de invertir en infraestructura, ejército o educación. Un trabajador chino en 1750–99 pagaba <strong>1.32 días de salario anual</strong> en impuestos; uno inglés pagaba 12.6 días.</p>
+                </div>
+
+                <div class="p-6 bg-white border-l-4 border-violet-600 rounded-r-lg shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-slate-900 text-xl mb-1">Período 4: República (1912–1949)</h3>
+                    <p class="text-slate-600 text-sm mb-3"><i class="fa-solid fa-fire mr-1"></i> Fragmentación y Guerra Civil</p>
+                    <p class="text-slate-700">Tras el colapso de la dinastía Qing sigue desorden: "Señores de la Guerra" (1916–28), invasión japonesa (1937–45), guerra civil (1945–49). El PIB per capita cae a mínimos: en 1950, apenas alcanza <strong>439 $1990</strong> (vs 450 en el año 1000). Después de un milenio, China está más pobre.</p>
+                </div>
+
+                <div class="p-6 bg-white border-l-4 border-red-600 rounded-r-lg shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-slate-900 text-xl mb-1">Período 5: Maoísmo (1949–1976)</h3>
+                    <p class="text-slate-600 text-sm mb-3"><i class="fa-solid fa-industry mr-1"></i> Crecimiento Extensivo Forzado</p>
+                    <p class="text-slate-700">La revolución comunista busca recuperar el poder estatal. Se colectiviza la agricultura, se nacionaliza la industria, se expande la educación básica. El PIB per capita crece de 439 (1950) a <strong>839 (1973)</strong>, un aumento significativo pero desde una base muy baja. Este es crecimiento extensivo (más gente, más fábricas) sin mejora de productividad o innovación.</p>
+                </div>
+
+                <div class="p-6 bg-white border-l-4 border-green-600 rounded-r-lg shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-slate-900 text-xl mb-1">Período 6: Reformas (1978–2010s)</h3>
+                    <p class="text-slate-600 text-sm mb-3"><i class="fa-solid fa-rocket mr-1"></i> La Inversión Institucional Revertida</p>
+                    <p class="text-slate-700">Deng Xiaoping invierte la estrategia: mantiene el Estado fuerte, pero descentraliza decisiones económicas. Se crean "zonas económicas especiales", se permite propiedad privada, se conecta a China con mercados mundiales. El resultado es <strong>crecimiento intensivo acelerado</strong>: PIB per capita salta de 839 (1973) a <strong>3,117 (1998)</strong>, un aumento de 270% en 25 años.</p>
+                </div>
+
+            </div>
+
+            <h2 id="evidencia" class="font-sans font-extrabold text-2xl md:text-3xl text-slate-900 tracking-tight pt-4">Evidencia Cuantitativa: Tablas Documentales</h2>
+
+            <div class="my-8 p-6 bg-indigo-50/50 border-l-4 border-indigo-600 rounded-r-xl font-sans not-italic text-sm md:text-base text-slate-800">
+                <p class="font-bold text-indigo-800 text-lg mb-2"><i class="fa-solid fa-chart-line mr-2"></i>Tabla 1: China en Perspectiva Global (Maddison)</p>
+                <p class="text-xs text-slate-600"><strong>Período:</strong> 1000–1998 | <strong>Fuente:</strong> Maddison (2001), citado en Brandt et al. (2014), p. 50</p>
+            </div>
+
+            <div class="overflow-x-auto my-6">
+                <table class="w-full border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-blue-600 text-white">
+                            <th class="border border-blue-700 px-3 py-2 text-left font-bold">Año</th>
+                            <th class="border border-blue-700 px-3 py-2 text-left font-bold">Población (mill.)</th>
+                            <th class="border border-blue-700 px-3 py-2 text-left font-bold">PIB pc ($1990)</th>
+                            <th class="border border-blue-700 px-3 py-2 text-left font-bold">% PIB Mundial</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-slate-200 hover:bg-blue-50">
+                            <td class="border border-slate-200 px-3 py-2 font-bold">1000</td>
+                            <td class="border border-slate-200 px-3 py-2">59</td>
+                            <td class="border border-slate-200 px-3 py-2">450</td>
+                            <td class="border border-slate-200 px-3 py-2">22.7%</td>
+                        </tr>
+                        <tr class="border-b border-slate-200 hover:bg-blue-50 bg-slate-50">
+                            <td class="border border-slate-200 px-3 py-2 font-bold">1820</td>
+                            <td class="border border-slate-200 px-3 py-2">381</td>
+                            <td class="border border-slate-200 px-3 py-2">600</td>
+                            <td class="border border-slate-200 px-3 py-2 font-bold text-green-700">32.9%</td>
+                        </tr>
+                        <tr class="border-b border-slate-200 hover:bg-blue-50">
+                            <td class="border border-slate-200 px-3 py-2 font-bold">1950</td>
+                            <td class="border border-slate-200 px-3 py-2">547</td>
+                            <td class="border border-slate-200 px-3 py-2">439</td>
+                            <td class="border border-slate-200 px-3 py-2 font-bold text-red-700">4.5%</td>
+                        </tr>
+                        <tr class="border-b border-slate-200 hover:bg-blue-50 bg-slate-50">
+                            <td class="border border-slate-200 px-3 py-2 font-bold">1973</td>
+                            <td class="border border-slate-200 px-3 py-2">882</td>
+                            <td class="border border-slate-200 px-3 py-2">839</td>
+                            <td class="border border-slate-200 px-3 py-2">4.6%</td>
+                        </tr>
+                        <tr class="border-b border-slate-200 hover:bg-blue-50">
+                            <td class="border border-slate-200 px-3 py-2 font-bold">1998</td>
+                            <td class="border border-slate-200 px-3 py-2">1,243</td>
+                            <td class="border border-slate-200 px-3 py-2">3,117</td>
+                            <td class="border border-slate-200 px-3 py-2 font-bold text-blue-700">11.5%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="my-8 p-6 bg-blue-50/50 border-l-4 border-blue-600 rounded-r-xl font-sans not-italic text-sm md:text-base text-slate-800">
+                <p class="font-bold text-blue-800"><i class="fa-solid fa-magnifying-glass mr-2"></i>Hallazgo Clave:</p>
+                <p>China pierde 28.4 puntos porcentuales de cuota mundial entre 1820 y 1950 (una caída del 86% relativo). Esto no refleja decrecimiento absoluto, sino que otras economías crecen más rápido gracias a industrialización. China permanece con población gigantesca pero baja productividad.</p>
+            </div>
+
+            <div id="instituciones" class="my-12 p-6 bg-slate-900 text-slate-200 rounded-lg">
+                <h2 class="font-sans font-extrabold text-2xl md:text-3xl text-white tracking-tight mb-4">Las Instituciones Políticas: Fortaleza y Rigidez</h2>
+
+                <p class="mb-4">El imperio Song-Qing desarrolló el Estado centralizado más sofisticado del mundo pre-industrial. Pero esa fortaleza para crecimiento extensivo (colonizar tierras, expandir población) inhibió el crecimiento intensivo (innovación, productividad).</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+                    <div class="bg-slate-800 p-4 rounded border-l-4 border-blue-400">
+                        <h4 class="font-bold text-blue-300 mb-2">Fortalezas del Sistema</h4>
+                        <ul class="text-sm space-y-1">
+                            <li>✓ Burocracia meritoria (exámenes civiles)</li>
+                            <li>✓ Unificación política (evita guerras internas)</li>
+                            <li>✓ Aparato estatal profesional</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded border-l-4 border-red-400">
+                        <h4 class="font-bold text-red-300 mb-2">Debilidades del Sistema</h4>
+                        <ul class="text-sm space-y-1">
+                            <li>✗ Ortodoxia ideológica confuciana</li>
+                            <li>✗ Monopolios estatales en sectores clave</li>
+                            <li>✗ Desincentivos a innovación privada</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p class="text-sm italic">Interpretación: Un Estado fuerte es ideal para crecimiento extensivo. Pero inhibe crecimiento intensivo. China optimizó para el primero durante mil años y quedó atrapada.</p>
+            </div>
+
+            <h2 class="font-sans font-extrabold text-2xl md:text-3xl text-slate-900 tracking-tight pt-4">Síntesis: Mecanismos de Largo Plazo</h2>
+
+            <div class="my-8 space-y-4">
+                <div class="p-4 bg-green-50 border-l-4 border-green-600 rounded-r-lg">
+                    <h4 class="font-bold text-green-900">1000–1800: Auge Institucional, Estancamiento de Productividad</h4>
+                    <p class="text-sm text-green-800 mt-2">Estado fuerte, burocracia meritoria, pero crecimiento per capita lento (450 → 600 en 800 años). Fiscalidad débil per capita impide inversión en innovación.</p>
+                </div>
+                <div class="p-4 bg-red-50 border-l-4 border-red-600 rounded-r-lg">
+                    <h4 class="font-bold text-red-900">1800–1950: Colapso de Autoridad, Crisis de Legitimidad</h4>
+                    <p class="text-sm text-red-800 mt-2">Qing débil fiscalmente, incapaz de responder a nuevas amenazas. PIB per capita cae a niveles medievales (439 en 1950).</p>
+                </div>
+                <div class="p-4 bg-blue-50 border-l-4 border-blue-600 rounded-r-lg">
+                    <h4 class="font-bold text-blue-900">1950–1978: Reconstrucción Estatal, Crecimiento Extensivo</h4>
+                    <p class="text-sm text-blue-800 mt-2">Comunismo re-centraliza el Estado. PIB per capita crece de 439 → 839 (+91% en 23 años). Pero sigue siendo extensivo sin innovación privada.</p>
+                </div>
+                <div class="p-4 bg-indigo-50 border-l-4 border-indigo-600 rounded-r-lg">
+                    <h4 class="font-bold text-indigo-900">1978–2010s: Inversión Institucional, Crecimiento Intensivo</h4>
+                    <p class="text-sm text-indigo-800 mt-2">Deng Xiaoping: Estado fuerte + innovación descentralizada. PIB per capita salta 839 → 3,117 (+271% en 25 años). Síntesis: centralización política + descentralización económica.</p>
+                </div>
+            </div>
+
+            <h2 class="font-sans font-extrabold text-2xl md:text-3xl text-slate-900 tracking-tight pt-4">Conclusiones</h2>
+
             <p>
-                El destino económico de China no fue determinado por geografía, cultura o recursos naturales,
-                sino por <strong>instituciones políticas</strong>. El imperio chino desarrolló un Estado centralizado
-                altamente efectivo hace mil años, que permitió <strong>crecimiento extensivo</strong> (más personas,
-                más tierra) pero sofocó el <strong>crecimiento intensivo</strong> (mejora de productividad, innovación).
-                Entre 1820 y 1973, esta rigidez institucional —combinada con guerras civiles, colonialismo extranjero
-                y revolución— produjo estancamiento. Las reformas post-1978 invirtieron esta lógica, permitiendo innovación
-                descentralizada dentro de una estructura estatal fuerte.
-            </p>
-        </div>
-    </section>
-
-    <!-- Chronology Section -->
-    <section style="background-color: rgba(49, 95, 80, 0.03);">
-        <h2 class="section-title">Cronología en Seis Períodos</h2>
-
-        <div class="timeline">
-            <!-- Period 1: Song -->
-            <div class="timeline-item">
-                <h4>Period 1: La Dinastía Song (960–1279)</h4>
-                <p class="period">El Apogeo Institucional</p>
-                <p>
-                    La dinastía Song perfecciona el aparato burocrático centralizado y basado en méritos (exámenes civiles).
-                    China desarrolla técnicas avanzadas de gobernanza fiscal: registros precisos de impuestos, estandarización
-                    de unidades, y redistributribución de recursos entre provincias. <strong>Tabla 2</strong> muestra que
-                    en Song (1085), la carga impositiva per capita es de <strong>0.80 shi/persona</strong> (índice 100).
-                </p>
-                <p style="margin-top: 1rem;">
-                    En este período, China es el centro económico mundial. La Tabla 1 (Maddison) estima que en el año 1000,
-                    China representa el <strong>22.7% del PIB mundial</strong> con apenas el 22% de la población.
-                </p>
-            </div>
-
-            <!-- Period 2: Ming-Qing Early -->
-            <div class="timeline-item">
-                <h4>Período 2: Ming–Qing Temprano (1368–1800)</h4>
-                <p class="period">Rigidez Institucional e Inercia Fiscal</p>
-                <p>
-                    Tras la caída de Yuan y el ascenso de Ming (1368), el Estado chino se vuelve progresivamente más restrictivo.
-                    Se prohíben navegaciones de larga distancia (1421-1433), se cierran puertos al comercio exterior, y se endurece
-                    la ideología confuciana ortodoxa. La fiscalidad declina dramáticamente: en Ming (1577), la carga per capita
-                    cae a <strong>0.24 shi/persona</strong> (índice 30), apenas un tercio de Song.
-                </p>
-                <p style="margin-top: 1rem;">
-                    Tabla 3 revela la paradoja fundamental: en 1700–49, China recauda <strong>1,304 toneladas de plata</strong>
-                    en ingresos absolutos (vs 932 Francia, 632 Inglaterra), pero con una población de ~150 millones, esto es solo
-                    <strong>8.6 gramos de plata per capita</strong> (vs 46.6 Francia, 93.5 Inglaterra). <strong>China es fiscalmente
-                    débil relativamente pese a su tamaño.</strong>
-                </p>
-            </div>
-
-            <!-- Period 3: Qing Late -->
-            <div class="timeline-item">
-                <h4>Período 3: Qing Tardío (1800–1911)</h4>
-                <p class="period">Crisis Institucional y Colapso Relativo</p>
-                <p>
-                    La Tabla 1 muestra el colapso: en 1820, China aún era el 32.9% del PIB mundial, pero para 1870 cae a 17.2%,
-                    y en 1913 a solo 8.9%. La carga fiscal per capita en Qing (1776) alcanza mínimos históricos:
-                    <strong>0.12 shi/persona</strong> (índice 15). El gobierno central pierde capacidad de invertir en infraestructura,
-                    ejército o educación.
-                </p>
-                <p style="margin-top: 1rem;">
-                    Tabla 3 Panel C (días de salario de trabajador urbano) muestra cruda realidad: un trabajador chino en 1750–99
-                    pagaba <strong>1.32 días de salario anual</strong> en impuestos; uno inglés pagaba 12.6 días. Pese a cargas
-                    fiscales bajas, China no invierte en educación, ferrocarriles, o industrialización. La debilidad fiscal
-                    genera debilidad estatal.
-                </p>
-            </div>
-
-            <!-- Period 4: Republic -->
-            <div class="timeline-item">
-                <h4>Período 4: República (1912–1949)</h4>
-                <p class="period">Fragmentación y Guerra Civil</p>
-                <p>
-                    La caída de la dinastía Qing en 1911 es seguida por desorden: los "Señores de la Guerra" (1916–28)
-                    fragmentan el país, luego invasión japonesa (1937–45), luego guerra civil (1945–49). Durante este período,
-                    el PIB per capita de China cae a mínimos: en 1950, apenas alcanza <strong>439 $1990</strong>
-                    (vs 450 en el año 1000). Después de una milenio, China está más pobre.
-                </p>
-            </div>
-
-            <!-- Period 5: Maoism -->
-            <div class="timeline-item">
-                <h4>Período 5: Maoísmo (1949–1976)</h4>
-                <p class="period">Crecimiento Extensivo Forzado</p>
-                <p>
-                    La revolución comunista busca recuperar el poder estatal (falla de la República). Se colectiviza la agricultura,
-                    se nacionaliza la industria, se expande la educación básica. El PIB per capita crece de 439 (1950) a
-                    <strong>839 (1973)</strong>, un aumento significativo pero desde una base muy baja. Este es crecimiento
-                    extensivo (más gente, más fábricas) sin mejora de productividad o innovación. El régimen muere en 1976
-                    dejando una economía bloqueada.
-                </p>
-            </div>
-
-            <!-- Period 6: Reforms -->
-            <div class="timeline-item">
-                <h4>Período 6: Reformas (1978–2010s)</h4>
-                <p class="period">La Inversión Institucional Revertida</p>
-                <p>
-                    Deng Xiaoping invierte la estrategia: mantiene el Estado fuerte y el Partido único, pero desentraliza
-                    decisiones económicas. Se crean "zonas económicas especiales", se permite propiedad privada, se conecta
-                    a China con mercados mundiales. El resultado es <strong>crecimiento intensivo acelerado</strong>: PIB per capita
-                    salta de 839 (1973) a <strong>3,117 (1998)</strong>, un aumento de 270% en 25 años.
-                </p>
-                <p style="margin-top: 1rem;">
-                    Para 2010s, China recupera el 15–18% del PIB mundial (acercándose a niveles históricos). El mecanismo:
-                    instituciones que permiten <strong>descentralización de innovación</strong> (empresarios locales decidiendo
-                    dónde invertir) dentro de <strong>centralización de planificación</strong> (el Estado asignando recursos
-                    estratégicos a infraestructura, educación, investigación).
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Quantitative Evidence Section -->
-    <section>
-        <h2 class="section-title">Evidencia Cuantitativa: Tablas Documentales</h2>
-
-        <!-- Table 1: Global Perspective -->
-        <div class="subsection-title">
-            <i class="fas fa-chart-line mr-2" style="color: var(--jade);"></i>Tabla 1: China en Perspectiva Global (Maddison)
-        </div>
-        <p style="margin-bottom: 1rem; color: var(--muted);">
-            <strong>Período:</strong> 1000–1998 | <strong>Fuente:</strong> Maddison (1995-2001) estimates, citadas en Brandt et al. (2014), p. 50
-        </p>
-
-        <div class="overflow-x-auto">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Año</th>
-                        <th>Población China (mill.)</th>
-                        <th>PIB China ($1990 mil mill.)</th>
-                        <th>PIB pc China ($1990)</th>
-                        <th>% PIB Mundial</th>
-                        <th>PIB pc / Europa Occ. (%)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>1000</strong></td>
-                        <td>59</td>
-                        <td>26.5</td>
-                        <td><strong>450</strong></td>
-                        <td>22.7%</td>
-                        <td>112.5%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1500</strong></td>
-                        <td>103</td>
-                        <td>61.8</td>
-                        <td><strong>600</strong></td>
-                        <td>25.0%</td>
-                        <td>77.5%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1600</strong></td>
-                        <td>160</td>
-                        <td>96</td>
-                        <td><strong>600</strong></td>
-                        <td>29.1%</td>
-                        <td>67.1%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1700</strong></td>
-                        <td>138</td>
-                        <td>82.8</td>
-                        <td><strong>600</strong></td>
-                        <td>22.3%</td>
-                        <td>58.6%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1820</strong></td>
-                        <td>381</td>
-                        <td>228.6</td>
-                        <td><strong>600</strong></td>
-                        <td>32.9%</td>
-                        <td>48.7%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1870</strong></td>
-                        <td>358</td>
-                        <td>189.7</td>
-                        <td><strong>530</strong></td>
-                        <td>17.2%</td>
-                        <td>26.8%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1913</strong></td>
-                        <td>437</td>
-                        <td>241.3</td>
-                        <td><strong>552</strong></td>
-                        <td>8.9%</td>
-                        <td>15.9%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1950</strong></td>
-                        <td>547</td>
-                        <td>239.9</td>
-                        <td><strong>439</strong></td>
-                        <td>4.5%</td>
-                        <td>9.6%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1973</strong></td>
-                        <td>882</td>
-                        <td>740</td>
-                        <td><strong>839</strong></td>
-                        <td>4.6%</td>
-                        <td>7.3%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1998</strong></td>
-                        <td>1,243</td>
-                        <td>3,873.3</td>
-                        <td><strong>3,117</strong></td>
-                        <td>11.5%</td>
-                        <td>17.4%</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="chart-container">
-            <div class="chart-title">Cuota del PIB Mundial de China (1000–1998)</div>
-            <canvas id="chart1"></canvas>
-            <div class="chart-note">Fuente: Maddison (1995-2001), citado en Brandt, Ma & Rawski (2014), p. 50. Nota: Solo años observados; no hay interpolación entre puntos.</div>
-        </div>
-
-        <div class="comparison-grid">
-            <div class="metric-card">
-                <h5>Apogeo (1820)</h5>
-                <div class="value" style="color: var(--jade);">32.9%</div>
-                <div class="unit">del PIB mundial</div>
-            </div>
-            <div class="metric-card">
-                <h5>Mínimo (1950)</h5>
-                <div class="value" style="color: var(--rust);">4.5%</div>
-                <div class="unit">del PIB mundial</div>
-            </div>
-            <div class="metric-card">
-                <h5>Recuperación (1998)</h5>
-                <div class="value" style="color: var(--gold);">11.5%</div>
-                <div class="unit">del PIB mundial</div>
-            </div>
-            <div class="metric-card">
-                <h5>Caída Máxima</h5>
-                <div class="value" style="color: var(--rust);">-86%</div>
-                <div class="unit">1820 → 1950</div>
-            </div>
-        </div>
-
-        <div class="callout">
-            <strong>Interpretación:</strong> China pierde 28.4 puntos porcentuales de cuota mundial entre 1820 y 1950
-            (una caída del 86% relativo). Esto no refleja decrecimiento absoluto, sino que otras economías crecen más rápido
-            gracias a industrialización. China permanece con población gigantesca pero baja productividad.
-        </div>
-
-        <!-- Table 2: Tax Burden -->
-        <div class="subsection-title" style="margin-top: 3rem;">
-            <i class="fas fa-coins mr-2" style="color: var(--rust);"></i>Tabla 2: Carga Fiscal Dinástica (1085–1776)
-        </div>
-        <p style="margin-bottom: 1rem; color: var(--muted);">
-            <strong>Período:</strong> 1085–1776 | <strong>Unidad:</strong> Carga per capita en shi (equivalentes de grano)
-            | <strong>Fuente:</strong> Brandt et al. (2014), p. 67
-        </p>
-
-        <div class="overflow-x-auto">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Dinastía</th>
-                        <th>Año</th>
-                        <th>Impuesto Tierra p.c. (shi)</th>
-                        <th>Impuestos Indirectos p.c. (shi)</th>
-                        <th>Carga Total p.c. (shi)</th>
-                        <th>Índice Relativo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Song</strong></td>
-                        <td><strong>1085</strong></td>
-                        <td>0.26</td>
-                        <td>0.54</td>
-                        <td><strong>0.80</strong></td>
-                        <td><strong style="color: var(--jade);">100</strong></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Ming</strong></td>
-                        <td><strong>1407</strong></td>
-                        <td>0.54–0.75</td>
-                        <td>0.02–0.03</td>
-                        <td><strong>0.56–0.79</strong></td>
-                        <td><strong style="color: var(--gold);">70–98</strong></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Ming</strong></td>
-                        <td><strong>1577</strong></td>
-                        <td>0.21</td>
-                        <td>0.03</td>
-                        <td><strong>0.24</strong></td>
-                        <td><strong style="color: var(--muted);">30</strong></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Qing</strong></td>
-                        <td><strong>1685</strong></td>
-                        <td>0.18</td>
-                        <td>0.04</td>
-                        <td><strong>0.22</strong></td>
-                        <td><strong style="color: var(--muted);">28</strong></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Qing</strong></td>
-                        <td><strong>1776</strong></td>
-                        <td>0.09</td>
-                        <td>0.03</td>
-                        <td><strong>0.12</strong></td>
-                        <td><strong style="color: var(--rust);">15</strong></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="chart-container">
-            <div class="chart-title">Índice de Carga Fiscal per Capita (1085–1776)</div>
-            <canvas id="chart2"></canvas>
-            <div class="chart-note">Fuente: Brandt, Ma & Rawski (2014), p. 67. Nota: Índice con base 100 = Song (1085). Carga expresada en equivalentes de grano (shi).</div>
-        </div>
-
-        <div class="callout">
-            <strong>Hallazgo Crítico:</strong> La carga fiscal desciende dramáticamente de Song a Qing: 100 → 15.
-            Esto NO significa que los impuestos hayan bajado (la recaudación absoluta creció), sino que la capacidad
-            per capita del Estado para invertir en infraestructura, defensa, y educación se colapsó. Un Qing tardío
-            (1776) recaudaba el 15% de lo que Song (1085) extraía de cada persona.
-        </div>
-
-        <!-- Table 3: International Comparison -->
-        <div class="subsection-title" style="margin-top: 3rem;">
-            <i class="fas fa-globe mr-2" style="color: var(--jade);"></i>Tabla 3: Comparación Internacional de Ingresos Fiscales (1650–1899)
-        </div>
-        <p style="margin-bottom: 1rem; color: var(--muted);">
-            <strong>Período:</strong> 1650–1899 | <strong>Países:</strong> China (Qing), Imperio Otomano, Rusia, Francia, España,
-            Inglaterra, República Holandesa | <strong>Fuente:</strong> Brandt et al. (2014), p. 69
-        </p>
-
-        <h4 style="font-weight: 600; margin: 2rem 0 1rem 0; color: var(--ink);">Panel A: Ingresos Absolutos del Gobierno Central (toneladas de plata)</h4>
-        <div class="overflow-x-auto">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Período</th>
-                        <th>China</th>
-                        <th>Otomano</th>
-                        <th>Rusia</th>
-                        <th>Francia</th>
-                        <th>España</th>
-                        <th>Inglaterra</th>
-                        <th>Holanda</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>1650–99</strong></td>
-                        <td><strong>940</strong></td>
-                        <td>248</td>
-                        <td>—</td>
-                        <td>851</td>
-                        <td>243</td>
-                        <td>239</td>
-                        <td>—</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1700–49</strong></td>
-                        <td><strong>1,304</strong></td>
-                        <td>294</td>
-                        <td>155</td>
-                        <td>932</td>
-                        <td>312</td>
-                        <td>632</td>
-                        <td>310</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1750–99</strong></td>
-                        <td><strong>1,229</strong></td>
-                        <td>263</td>
-                        <td>492</td>
-                        <td>1,612</td>
-                        <td>618</td>
-                        <td>1,370</td>
-                        <td>359</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1800–49</strong></td>
-                        <td><strong>1,367</strong></td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>6,156</td>
-                        <td>—</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1850–99</strong></td>
-                        <td><strong>2,651</strong></td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>10,941</td>
-                        <td>—</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <h4 style="font-weight: 600; margin: 2rem 0 1rem 0; color: var(--ink);">Panel B: Ingresos per Capita (gramos de plata)</h4>
-        <div class="overflow-x-auto">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Período</th>
-                        <th>China</th>
-                        <th>Otomano</th>
-                        <th>Rusia</th>
-                        <th>Francia</th>
-                        <th>España</th>
-                        <th>Inglaterra</th>
-                        <th>Holanda</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>1650–99</strong></td>
-                        <td><strong>7.0</strong></td>
-                        <td>11.8</td>
-                        <td>—</td>
-                        <td>46.0</td>
-                        <td>35.8</td>
-                        <td>45.1</td>
-                        <td>—</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1700–49</strong></td>
-                        <td><strong>8.6</strong></td>
-                        <td>15.5</td>
-                        <td>6.4</td>
-                        <td>46.6</td>
-                        <td>41.6</td>
-                        <td>93.5</td>
-                        <td>161.1</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1750–99</strong></td>
-                        <td><strong>4.2</strong></td>
-                        <td>12.9</td>
-                        <td>21.0</td>
-                        <td>66.4</td>
-                        <td>63.1</td>
-                        <td>158.4</td>
-                        <td>170.7</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1800–49</strong></td>
-                        <td><strong>3.4</strong></td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>303.8</td>
-                        <td>—</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1850–99</strong></td>
-                        <td><strong>7.0</strong></td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>344.1</td>
-                        <td>—</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="chart-container">
-            <div class="chart-title">Ingresos Fiscales per Capita: China vs. Inglaterra (1650–1850)</div>
-            <canvas id="chart3"></canvas>
-            <div class="chart-note">Fuente: Brandt, Ma & Rawski (2014), p. 69, Panel B. Unidad: gramos de plata per capita. China muestra divergencia creciente respecto a Inglaterra.</div>
-        </div>
-
-        <h4 style="font-weight: 600; margin: 2rem 0 1rem 0; color: var(--ink);">Panel C: Ingresos per Capita en Días de Salario de Trabajador Urbano No-Calificado</h4>
-        <div class="overflow-x-auto">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Período</th>
-                        <th>China</th>
-                        <th>Otomano</th>
-                        <th>Rusia</th>
-                        <th>Francia</th>
-                        <th>España</th>
-                        <th>Inglaterra</th>
-                        <th>Holanda</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>1700–49</strong></td>
-                        <td><strong>2.26</strong></td>
-                        <td>2.6</td>
-                        <td>6.4</td>
-                        <td>6.7</td>
-                        <td>4.6</td>
-                        <td>8.9</td>
-                        <td>24.1</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1750–99</strong></td>
-                        <td><strong>1.32</strong></td>
-                        <td>2.0</td>
-                        <td>8.3</td>
-                        <td>11.4</td>
-                        <td>10.0</td>
-                        <td>12.6</td>
-                        <td>22.8</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1800–49</strong></td>
-                        <td><strong>1.23</strong></td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>17.2</td>
-                        <td>—</td>
-                    </tr>
-                    <tr>
-                        <td><strong>1850–99</strong></td>
-                        <td><strong>1.99</strong></td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>19.4</td>
-                        <td>—</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="callout">
-            <strong>La Paradoja Fundamental:</strong> China recaudaba <strong>más dinero absoluto</strong> que cualquier
-            potencia europea (Panel A: 1,304 tons plata vs 932 Francia en 1700s), pero <strong>mucho menos per capita</strong>
-            (Panel B: 8.6g plata vs 46.6g Francia). En Panel C (normalizado a salarios), la divergencia es aún más clara:
-            un trabajador chino pagaba <strong>2.26 días de salario</strong> en 1700–49; uno francés pagaba 6.7 días.
-            <br><br>
-            <strong>¿Por qué esto importa?</strong> Un Estado con carga fiscal menor per capita tiene menos recursos
-            para invertir en infraestructura, educación, y ejército. China no estaba "sobretaxada"; estaba
-            "subfinanciada" relativamente a su tamaño.
-        </div>
-
-        <div class="chart-container">
-            <div class="chart-title">Carga Fiscal Normalizada: China vs. Potencias Europeas (1700–1850)</div>
-            <canvas id="chart4"></canvas>
-            <div class="chart-note">Fuente: Brandt, Ma & Rawski (2014), p. 69, Panel C. Unidad: días de salario de trabajador urbano. China muestra carga fiscal más baja en términos de poder adquisitivo.</div>
-        </div>
-
-        <!-- Figure 1: Qing Expenditure -->
-        <div class="subsection-title" style="margin-top: 3rem;">
-            <i class="fas fa-chart-bar mr-2" style="color: var(--rust);"></i>Figura 1: Gasto Fiscal Real del Qing (1652–1911)
-        </div>
-        <p style="margin-bottom: 1rem; color: var(--muted);">
-            <strong>Período:</strong> 1652–1911 | <strong>Unidad:</strong> Taels de plata, shi de arroz, taels per capita (escala derecha)
-            | <strong>Fuente:</strong> Brandt et al. (2014), p. 68
-        </p>
-
-        <div class="thesis-box">
-            <p>
-                La Figura 1 grafica el gasto fiscal del Qing a lo largo de 260 años. Muestra tres variables:
-                <strong>gasto nominal</strong> (en taels de plata, picos después de 1750),
-                <strong>gasto real</strong> (deflacionado por índices de precios de arroz, más estable),
-                y <strong>gasto per capita</strong> (dividido por población, <strong>cae a largo plazo</strong>).
-            </p>
-            <p style="margin-top: 1rem;">
-                <strong>Interpretación:</strong> Aunque el Qing recaudaba más dinero nominal en términos absolutos
-                conforme el tiempo avanzaba, por persona la capacidad fiscal se descomponía. Una dinastía que
-                crecía en población pero no mejoraba su base impositiva relativamente se volvía más pobre per capita.
-                Esta es la explicación de por qué el Qing tardío (s. XIX) fue vulnerable a invasión extranjera y
-                rebeldías internas: simplemente no tenía recursos para un ejército o un aparato burocrático competitivo.
-            </p>
-        </div>
-
-        <p style="margin-top: 1rem; color: var(--muted); font-style: italic;">
-            <strong>Nota:</strong> Los valores específicos de la Figura 1 no están disponibles en forma tabular en las primeras 50 páginas del PDF.
-            La interpretación se basa en la descripción visual y metodológica de Brandt et al.
-        </p>
-    </section>
-
-    <!-- Political Institutions Section -->
-    <section style="background-color: rgba(164, 76, 50, 0.03);">
-        <h2 class="section-title">Las Instituciones Políticas: Fortaleza y Rigidez</h2>
-
-        <div class="subsection-title">¿Por qué números débiles durante 250 años?</div>
-
-        <p style="font-size: 1.05rem; margin: 1.5rem 0;">
-            La historia económica de China no es de "decadencia" cultural sino de <strong>instituciones mal calibradas</strong>.
-            El imperio Song-Qing desarrolló el Estado centralizado más sofisticado del mundo pre-industrial:
-        </p>
-
-        <div class="comparison-grid">
-            <div class="metric-card">
-                <h5>Fortaleza: Burocracia Meritoria</h5>
-                <p style="font-size: 0.95rem; margin-top: 0.5rem;">
-                    Exámenes civiles en Song y Qing permitían ascenso social por conocimiento, no solo linaje.
-                    Esto atraía talento y generaba un aparato estatal profesional.
-                </p>
-            </div>
-
-            <div class="metric-card">
-                <h5>Fortaleza: Unificación Política</h5>
-                <p style="font-size: 0.95rem; margin-top: 0.5rem;">
-                    A diferencia de Europa fragmentada en reinos competidores, China fue territorio unificado bajo
-                    un Emperador. Esto evitaba guerras internas pero también sofocaba competencia entre gobiernos locales.
-                </p>
-            </div>
-
-            <div class="metric-card">
-                <h5>Debilidad: Ortodoxia Ideológica</h5>
-                <p style="font-size: 0.95rem; margin-top: 0.5rem;">
-                    El confucianismo ortodoxo veía el comercio privado como inferior a la agricultura. Esto frenaba
-                    inversión mercantil y una clase empresarial dinámica.
-                </p>
-            </div>
-
-            <div class="metric-card">
-                <h5>Debilidad: Control Estatal sobre Innovación</h5>
-                <p style="font-size: 0.95rem; margin-top: 0.5rem;">
-                    El Estado monopolizaba sectores clave (sal, hierro). Esto financiaba al gobierno pero desincentivaba
-                    innovación privada. Europa, más fragmentada, permitía competencia industrial.
-                </p>
-            </div>
-        </div>
-
-        <p style="margin-top: 2rem; font-size: 1.05rem;">
-            <strong>La Paradoja Institucional:</strong> Un Estado fuerte es ideal para <strong>crecimiento extensivo</strong>
-            (colonizar nuevas tierras, expandir población). Pero inhibe <strong>crecimiento intensivo</strong>
-            (mejorar productividad, innovar). China optimizó para el primero durante mil años y quedó atrapada.
-        </p>
-
-        <div class="thesis-box" style="border-left-color: var(--rust);">
-            <h3 style="font-size: 1.2rem; color: var(--rust); margin-bottom: 1rem;">El "Great Divergence" (Gran Divergencia)</h3>
-            <p>
-                Entre 1500–1800, mientras China estancaba su crecimiento intensivo, Europa Occidental experimentaba:
-            </p>
-            <ul style="margin: 1rem 0; margin-left: 1.5rem;">
-                <li style="margin-bottom: 0.5rem;">✓ Fragmentación política → competencia entre reinos → incentivos a innovar</li>
-                <li style="margin-bottom: 0.5rem;">✓ Reforma protestante → cuestionamiento de autoridad tradicional</li>
-                <li style="margin-bottom: 0.5rem;">✓ Revolución científica → método empírico desplaza escolasticismo</li>
-                <li style="margin-bottom: 0.5rem;">✓ Capitalismo mercantil → búsqueda de ganancias privadas → nuevas tecnologías</li>
-            </ul>
-            <p style="margin-top: 1rem;">
-                China tenía tecnología superior en 1500 (brújula, pólvora, imprenta). Pero Europa fragmentada compitió
-                por adoptarla y mejorarla. China unificada no tuvo ese incentivo. El resultado: divergencia en productividad.
-            </p>
-        </div>
-    </section>
-
-    <!-- Synthesis Section -->
-    <section>
-        <h2 class="section-title">Síntesis: Mecanismos de Largo Plazo</h2>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0;">
-            <div style="background-color: rgba(49, 95, 80, 0.05); padding: 1.5rem; border-radius: 8px; border-left: 5px solid var(--jade);">
-                <h4 style="font-weight: 700; color: var(--jade); margin-bottom: 1rem;">1000–1800: Auge Institucional, Estancamiento de Productividad</h4>
-                <ul style="margin-left: 1.5rem;">
-                    <li style="margin-bottom: 0.5rem;">Estado fuerte, unificado, burocracia meritoria</li>
-                    <li style="margin-bottom: 0.5rem;">PIB per capita crece lentamente (450 → 600 en 800 años)</li>
-                    <li style="margin-bottom: 0.5rem;">Crecimiento es extensivo: más gente, más tierra cultivada</li>
-                    <li style="margin-bottom: 0.5rem;">Fiscalidad débil per capita → inversión limitada en innovación</li>
-                    <li>Europa fragmentada pero dinámica; China unificada pero rígida</li>
-                </ul>
-            </div>
-
-            <div style="background-color: rgba(164, 76, 50, 0.05); padding: 1.5rem; border-radius: 8px; border-left: 5px solid var(--rust);">
-                <h4 style="font-weight: 700; color: var(--rust); margin-bottom: 1rem;">1800–1950: Colapso de Autoridad, Crisis de Legitimidad</h4>
-                <ul style="margin-left: 1.5rem;">
-                    <li style="margin-bottom: 0.5rem;">Qing débil fiscalmente, incapaz de responder a nuevas amenazas</li>
-                    <li style="margin-bottom: 0.5rem;">Invasiones occidentales, guerras de opio, fragmentación política</li>
-                    <li style="margin-bottom: 0.5rem;">PIB per capita cae a niveles medievales (439 en 1950)</li>
-                    <li style="margin-bottom: 0.5rem;">Instituciones antiguas colapsan (1911); nuevas aún no consolidadas</li>
-                    <li>Crecimiento negativo o estancado por 150 años</li>
-                </ul>
-            </div>
-
-            <div style="background-color: rgba(196, 154, 82, 0.05); padding: 1.5rem; border-radius: 8px; border-left: 5px solid var(--gold);">
-                <h4 style="font-weight: 700; color: var(--gold); margin-bottom: 1rem;">1950–1978: Reconstrucción Estatal, Crecimiento Extensivo Forzado</h4>
-                <ul style="margin-left: 1.5rem;">
-                    <li style="margin-bottom: 0.5rem;">Comunismo re-centraliza el Estado (recupera capacidad de 1950s)</li>
-                    <li style="margin-bottom: 0.5rem;">Educación masiva, colectivización agrícola, industria estatal</li>
-                    <li style="margin-bottom: 0.5rem;">PIB per capita crece de 439 → 839 (+91% en 23 años)</li>
-                    <li style="margin-bottom: 0.5rem;">Pero sigue siendo crecimiento extensivo sin innovación privada</li>
-                    <li>Rigidez burocrática similar a Qing, ideología marxista reemplaza confucianismo</li>
-                </ul>
-            </div>
-
-            <div style="background-color: rgba(49, 95, 80, 0.05); padding: 1.5rem; border-radius: 8px; border-left: 5px solid var(--jade);">
-                <h4 style="font-weight: 700; color: var(--jade); margin-bottom: 1rem;">1978–2010s: Inversión Institucional, Crecimiento Intensivo</h4>
-                <ul style="margin-left: 1.5rem;">
-                    <li style="margin-bottom: 0.5rem;">Deng Xiaoping: mantén Estado fuerte, descentraliza innovación</li>
-                    <li style="margin-bottom: 0.5rem;">Zonas económicas especiales, propiedad privada, competencia de mercado</li>
-                    <li style="margin-bottom: 0.5rem;">PIB per capita salta 839 → 3,117 (+271% en 25 años)</li>
-                    <li style="margin-bottom: 0.5rem;">Mecanismo: Estado planifica infraestructura; empresarios privados innovan</li>
-                    <li>Síntesis: centralización política + descentralización económica</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="callout" style="margin-top: 2rem; background-color: rgba(49, 95, 80, 0.08); border-left-color: var(--jade);">
-            <h4 style="font-weight: 700; color: var(--jade); margin-bottom: 1rem;">
-                <i class="fas fa-lightbulb mr-2"></i>Insight Central
-            </h4>
-            <p>
-                <strong>La historia de China es la historia de instituciones, no de geografía, recursos o cultura.</strong>
-                Song-Qing construyeron un Estado tan centralizado que sofocó la innovación privada. Occidente, fragmentado,
-                permitió competencia y cambio. Cuando China invierte esta lógica post-1978 —manteniendo la fortaleza estatal
-                pero permitiendo descentralización económica—, recupera la posición que las cifras de Maddison (Tabla 1)
-                muestran perdida entre 1820 y 1973.
-            </p>
-            <p style="margin-top: 1rem;">
-                Las Tablas 2 y 3 documentan la debilidad fiscal per capita que impidió al Qing invertir en educación e
-                infraestructura competitivos. Ese fue el mecanismo del rezago: no incompetencia, sino estructuras que
-                desincentivaban la mejora incremental.
-            </p>
-        </div>
-    </section>
-
-    <!-- Conclusions Section -->
-    <section style="background-color: rgba(23, 35, 31, 0.03);">
-        <h2 class="section-title">Conclusiones</h2>
-
-        <div style="font-size: 1.05rem; line-height: 1.8; color: var(--ink);">
-            <p style="margin-bottom: 1.5rem;">
-                La pregunta con la que comenzamos —¿por qué China pasó de ser un tercio de la economía mundial a un 4.5%?—
-                tiene una respuesta documentada en las cifras cuantitativas de Brandt, Ma & Rawski (2014):
+                La pregunta con la que comenzamos tiene una respuesta documentada en las cifras cuantitativas de Brandt, Ma & Rawski (2014):
             </p>
 
-            <ol style="margin-left: 1.5rem; margin-bottom: 2rem;">
-                <li style="margin-bottom: 1rem;">
-                    <strong>Rigidez institucional (1000–1800):</strong> Un Estado altamente centralizado es eficiente en
-                    recaudar impuestos, pero débil per capita relativamente a su tamaño. Esto limita inversión en innovación
-                    y educación. Tabla 2 muestra carga fiscal colapsando 100 → 15 (índice). Tabla 3 muestra ingresos per capita
-                    de China en 1700s igual a 8.6g plata, mientras Francia recaudaba 46.6g.
-                </li>
+            <ol class="list-decimal list-inside space-y-4 ml-4">
+                <li><strong>Rigidez institucional (1000–1800):</strong> Estado altamente centralizado pero débil per capita. Tabla 2 muestra carga fiscal colapsando 100 → 15. Tabla 3 muestra China recaudando 8.6g plata per capita vs Francia 46.6g.</li>
 
-                <li style="margin-bottom: 1rem;">
-                    <strong>Decadencia relativa (1800–1950):</strong> Cuando Occidente industrializa, China no puede seguir
-                    (fiscalidad débil impide inversión masiva). Tabla 1 documenta caída de cuota de PIB mundial: 32.9% (1820)
-                    → 4.5% (1950). Esto NO es decadencia absoluta, sino estancamiento relativo mientras otros crecen más.
-                </li>
+                <li><strong>Decadencia relativa (1800–1950):</strong> Occidente industrializa; China no puede seguir. Tabla 1 documenta caída: 32.9% (1820) → 4.5% (1950).</li>
 
-                <li style="margin-bottom: 1rem;">
-                    <strong>Recuperación mediante inversión institucional (1978–2010s):</strong> Cuando las reformas permiten
-                    descentralización económica dentro de un Estado fuerte, China experimenta crecimiento intensivo acelerado.
-                    Tabla 1 muestra recuperación de cuota: 4.6% (1973) → 11.5% (1998). Proyecciones post-2010 sugieren que
-                    China alcanza 15–18% de PIB mundial, aproximándose a niveles históricos (pre-1820).
-                </li>
+                <li><strong>Recuperación mediante inversión institucional (1978–2010s):</strong> Cuando las reformas permiten descentralización económica dentro de un Estado fuerte, China experimenta crecimiento acelerado. Tabla 1 muestra recuperación: 4.6% (1973) → 11.5% (1998).</li>
 
-                <li style="margin-bottom: 1rem;">
-                    <strong>Mecanismo subyacente:</strong> Instituciones que <strong>combinan</strong> capacidad estatal central
-                    (planificación, regulación, inversión en educación/infraestructura) con <strong>libertad de innovación privada</strong>
-                    (mercado, competencia, ganancias). Song-Qing tenían lo primero sin lo segundo. Occidente industrial tenía lo segundo
-                    sin lo primero (mercados competitivos pero Estados débiles en servicios públicos). China post-1978 busca ambos.
-                </li>
+                <li><strong>Mecanismo subyacente:</strong> Instituciones que combinan capacidad estatal central con libertad de innovación privada. Song-Qing tenían lo primero sin lo segundo. Occidente industrial tenía lo segundo sin lo primero. China post-1978 busca ambos.</li>
             </ol>
 
-            <p style="margin-bottom: 1.5rem;">
-                <strong>Implicación para el futuro:</strong> Si las instituciones son el determinante de largo plazo, entonces
-                el futuro de China dependerá de si puede mantener esa síntesis: crecimiento económico descentralizado sin
-                fragmentar la capacidad estatal de planificación. Las cifras documentales de Brandt et al. muestran que cuando
-                lo ha logrado (1978–2010s), el crecimiento es acelerado. Cuando no ha podido (1800–1950), el crecimiento es nulo.
-            </p>
+        </article>
+    </section>
 
-            <div style="padding: 2rem; background-color: var(--paper); border-radius: 8px; border: 2px solid var(--jade);">
-                <h4 style="font-weight: 700; color: var(--jade); margin-bottom: 1rem;">
-                    Pregunta para futuras investigaciones:
-                </h4>
-                <p>
-                    ¿Pueden los regímenes de partido único combinar descentralización económica con planificación centralizada
-                    indefinidamente? Las cifras de Maddison muestran que mientras China mantiene esa combinación (1978–2010s),
-                    crece más rápido que Occidente. Si esa síntesis se quiebra, ¿volvería al estancamiento de 1800–1950, o
-                    desarrollaría nuevas instituciones?
+    <!-- Appendix -->
+    <section class="max-w-3xl mx-auto px-4 py-12 border-t border-slate-200">
+        <h2 class="font-sans font-extrabold text-2xl md:text-3xl text-slate-900 tracking-tight mb-4">Apéndice: Validación Documental</h2>
+
+        <div class="mb-8 p-4 bg-green-50 border-l-4 border-green-600 rounded-r-lg">
+            <h3 class="font-bold text-green-900 mb-3"><i class="fa-solid fa-check-circle mr-2"></i>Datos Validados</h3>
+            <ul class="text-sm space-y-1 text-green-800">
+                <li>✓ <strong>Tabla 1 (Maddison):</strong> 10 observaciones puntuales, 1000–1998. Valores exactos validados contra PDF p. 50.</li>
+                <li>✓ <strong>Tabla 2 (Impuestos dinásticos):</strong> 5 observaciones, 1085–1776. Valores exactos validados contra PDF p. 67.</li>
+                <li>✓ <strong>Tabla 3 (Comparativa internacional):</strong> 4 paneles, 1650–1899. Valores exactos validados contra PDF p. 69.</li>
+            </ul>
+        </div>
+
+        <div class="p-4 bg-yellow-50 border-l-4 border-yellow-600 rounded-r-lg">
+            <h3 class="font-bold text-yellow-900 mb-3"><i class="fa-solid fa-exclamation-triangle mr-2"></i>Limitaciones Metodológicas</h3>
+            <ul class="text-sm space-y-1 text-yellow-800">
+                <li>⚠ <strong>Tabla 1:</strong> Gaps temporales de 100–70 años. NO interpolamos valores intermedios.</li>
+                <li>⚠ <strong>Tabla 2:</strong> Unidades en "shi" (grano). Conversiones a moneda moderna NO están en el PDF.</li>
+                <li>⚠ <strong>Tabla 3:</strong> Datos incompletos antes de 1700 y después de 1850.</li>
+                <li>⚠ <strong>Estimaciones pre-1800:</strong> Indirectas. No existe contabilidad nacional moderna para Song/Ming/Qing.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- References Section -->
+    <footer id="referencias" class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 scroll-mt-12">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="border-b border-slate-800 pb-8 mb-8">
+                <h3 class="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-blue-400"></i> Fuentes Originales Citadas (Estilo APA 7)
+                </h3>
+                <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 text-xs md:text-sm font-mono text-slate-300 leading-relaxed space-y-4">
+
+                    <p>
+                        Brandt, L., Ma, D., &amp; Rawski, T. G. (2014). From divergence to convergence: Reevaluating the history behind China's economic boom. <em>Journal of Economic Literature</em>, <em>52</em>(1), 45–123. https://doi.org/10.1257/jel.52.1.45
+                    </p>
+
+                    <p>
+                        Maddison, A. (2001). <em>The world economy: A millennial perspective</em>. OECD Publishing. https://doi.org/10.1787/9789264189980-en
+                    </p>
+
+                    <p>
+                        Karaman, K. K., &amp; Pamuk, Ş. (2010). Ottoman state finances in European perspective, 1500–1914. <em>The Journal of Economic History</em>, <em>70</em>(3), 593–629. https://doi.org/10.1017/S0022050710000598
+                    </p>
+
+                    <p>
+                        Ma, D. (2012). <em>Measuring Chinese economic performance in the long run</em> [Unpublished manuscript]. London School of Economics and Political Science, Department of Economic History.
+                    </p>
+
+                    <p>
+                        Needham, J. (1978). <em>The shorter science and civilisation in China</em> (Vol. 1). Cambridge University Press.
+                    </p>
+
+                    <p>
+                        Perkins, D. H. (1969). <em>Agricultural development in China 1368–1968</em>. Aldine Publishing Company.
+                    </p>
+
+                </div>
+            </div>
+
+            <div class="pt-8">
+                <p class="text-slate-400 text-sm mb-2">
+                    <strong>Artículo:</strong> La Historia Económica de China: Del Apogeo al Rezago y la Recuperación (960–2010s)
+                </p>
+                <p class="text-slate-500 text-xs">
+                    Auditoría documental y diseño: Francisco Letelier Castro (2026). <br>
+                    Validación de datos: Todas las cifras son trazables al PDF original (Brandt, Ma &amp; Rawski, 2014).<br>
+                    Metodología: No se realizaron interpolaciones ni extrapolaciones más allá de los datos reportados.
                 </p>
             </div>
-        </div>
-    </section>
 
-    <!-- Appendix: Data Quality Section -->
-    <section style="background-color: rgba(101, 113, 107, 0.05); border-top: 2px solid var(--muted);">
-        <h2 class="section-title">Apéndice: Validación Documental y Limitaciones</h2>
-
-        <div class="subsection-title">
-            <i class="fas fa-check-circle mr-2" style="color: var(--jade);"></i>Datos Validados
-        </div>
-        <ul style="margin-left: 1.5rem; margin-bottom: 2rem;">
-            <li style="margin-bottom: 0.5rem;">✓ Tabla 1 (Maddison): 10 observaciones puntuales, 1000–1998. Valores exactos validados contra PDF p. 50.</li>
-            <li style="margin-bottom: 0.5rem;">✓ Tabla 2 (Impuestos dinásticos): 5 observaciones, 1085–1776. Valores exactos validados contra PDF p. 67.</li>
-            <li style="margin-bottom: 0.5rem;">✓ Tabla 3 (Comparativa internacional): 4 paneles, 1650–1899. Valores exactos validados contra PDF p. 69.</li>
-            <li>✓ Figura 1 (Gasto Qing): Descripción narrativa y metodológica validada contra PDF p. 68.</li>
-        </ul>
-
-        <div class="subsection-title">
-            <i class="fas fa-exclamation-triangle mr-2" style="color: var(--rust);"></i>Limitaciones Metodológicas
-        </div>
-        <ul style="margin-left: 1.5rem; margin-bottom: 2rem;">
-            <li style="margin-bottom: 0.5rem;">⚠ Tabla 1: Gaps temporales de 100–70 años. NO interpolamos valores intermedios.</li>
-            <li style="margin-bottom: 0.5rem;">⚠ Tabla 2: Unidades en "shi" (grano). Conversiones a moneda moderna NO están disponibles en el PDF.</li>
-            <li style="margin-bottom: 0.5rem;">⚠ Tabla 3 Panel C: Datos incompletos antes de 1700 y después de 1850.</li>
-            <li style="margin-bottom: 0.5rem;">⚠ Figura 1: Valores específicos NO están disponibles en forma tabular. Interpretación basada en descripción visual.</li>
-            <li>⚠ Todas las estimaciones pre-1800 (Maddison) son indirectas. No existe contabilidad nacional moderna para Song/Ming/Qing.</li>
-        </ul>
-
-        <div class="subsection-title">
-            <i class="fas fa-book mr-2" style="color: var(--jade);"></i>Fuentes Originales Citadas
-        </div>
-        <ul style="margin-left: 1.5rem;">
-            <li style="margin-bottom: 0.5rem;">Maddison, A. (1995, 2001). <em>Monitoring the World Economy, 1820–1992</em>. OECD.</li>
-            <li style="margin-bottom: 0.5rem;">Brandt, L., Ma, D., & Rawski, T. G. (2014). "From Divergence to Convergence: Reevaluating the History Behind China's Economic Boom." <em>Journal of Economic Literature</em>, 52(1), 45–123.</li>
-            <li>Qing archives: Fiscal data reconstructed by Ma & Rawski (1990s) from historical documents.</li>
-        </ul>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div style="max-width: 1200px; margin: 0 auto;">
-            <p style="margin-bottom: 1rem;">
-                <strong>Artículo:</strong> La Historia Económica de China (960–2010s)
-            </p>
-            <p style="margin-bottom: 1rem;">
-                <strong>Fuente primaria:</strong> Brandt, Loren, Debin Ma, y Thomas G. Rawski (2014).
-                "From Divergence to Convergence: Reevaluating the History Behind China's Economic Boom."
-                <em>Journal of Economic Literature</em>, 52(1), 45–123.
-            </p>
-            <p style="margin-bottom: 2rem; font-size: 0.85rem; color: rgba(244, 241, 233, 0.7);">
-                Auditoría documental y visualización: Francisco Letelier (2026).
-                <br>Validación de datos: Todas las cifras son trazables al PDF original.
-                <br>Metodología: No se realizaron interpolaciones ni extrapolaciones más allá de los datos reportados.
-            </p>
-            <p>
-                <a href="../index.html">Volver al sitio</a> | <a href="../posts.html">Galería de artículos</a>
-            </p>
+            <div class="mt-8 pt-8 border-t border-slate-800 text-center">
+                <p class="text-slate-500 text-xs">
+                    <a href="../index.html" class="text-blue-400 hover:text-blue-300">Volver al sitio</a> |
+                    <a href="../posts.html" class="text-blue-400 hover:text-blue-300">Galería de artículos</a>
+                </p>
+            </div>
         </div>
     </footer>
 
-    <!-- JavaScript for Charts -->
-    <script>
-        // Chart 1: China's Share of World GDP
-        const ctx1 = document.getElementById('chart1').getContext('2d');
-        new Chart(ctx1, {
-            type: 'line',
-            data: {
-                labels: ['1000', '1500', '1600', '1700', '1820', '1870', '1913', '1950', '1973', '1998'],
-                datasets: [{
-                    label: '% del PIB Mundial',
-                    data: [22.7, 25.0, 29.1, 22.3, 32.9, 17.2, 8.9, 4.5, 4.6, 11.5],
-                    borderColor: '#315f50',
-                    backgroundColor: 'rgba(49, 95, 80, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 6,
-                    pointBackgroundColor: '#315f50',
-                    pointBorderColor: '#f4f1e9',
-                    pointBorderWidth: 2,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: { font: { size: 12 }, color: '#17231f' }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 35,
-                        ticks: { color: '#65716b', font: { size: 11 } },
-                        grid: { color: 'rgba(49, 95, 80, 0.1)' }
-                    },
-                    x: {
-                        ticks: { color: '#65716b', font: { size: 11 } },
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
-
-        // Chart 2: Tax Burden Index
-        const ctx2 = document.getElementById('chart2').getContext('2d');
-        new Chart(ctx2, {
-            type: 'bar',
-            data: {
-                labels: ['Song\n1085', 'Ming\n1407', 'Ming\n1577', 'Qing\n1685', 'Qing\n1776'],
-                datasets: [{
-                    label: 'Índice de Carga Fiscal (Song 1085 = 100)',
-                    data: [100, 84, 30, 28, 15],
-                    backgroundColor: [
-                        '#315f50',
-                        '#c49a52',
-                        '#a44c32',
-                        '#a44c32',
-                        '#a44c32'
-                    ],
-                    borderColor: '#17231f',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: undefined,
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: { font: { size: 12 }, color: '#17231f' }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 110,
-                        ticks: { color: '#65716b', font: { size: 11 } },
-                        grid: { color: 'rgba(49, 95, 80, 0.1)' }
-                    },
-                    x: {
-                        ticks: { color: '#65716b', font: { size: 11 } },
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
-
-        // Chart 3: Per Capita Tax Revenue
-        const ctx3 = document.getElementById('chart3').getContext('2d');
-        new Chart(ctx3, {
-            type: 'line',
-            data: {
-                labels: ['1650-99', '1700-49', '1750-99', '1800-49', '1850-99'],
-                datasets: [
-                    {
-                        label: 'China',
-                        data: [7.0, 8.6, 4.2, 3.4, 7.0],
-                        borderColor: '#315f50',
-                        backgroundColor: 'rgba(49, 95, 80, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.3,
-                        pointRadius: 5,
-                        pointBackgroundColor: '#315f50',
-                    },
-                    {
-                        label: 'Inglaterra',
-                        data: [45.1, 93.5, 158.4, 303.8, 344.1],
-                        borderColor: '#a44c32',
-                        backgroundColor: 'rgba(164, 76, 50, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.3,
-                        pointRadius: 5,
-                        pointBackgroundColor: '#a44c32',
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: { font: { size: 12 }, color: '#17231f' }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { color: '#65716b', font: { size: 11 } },
-                        grid: { color: 'rgba(49, 95, 80, 0.1)' }
-                    },
-                    x: {
-                        ticks: { color: '#65716b', font: { size: 11 } },
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
-
-        // Chart 4: Tax Burden in Days of Wages
-        const ctx4 = document.getElementById('chart4').getContext('2d');
-        new Chart(ctx4, {
-            type: 'bar',
-            data: {
-                labels: ['1700-49', '1750-99', '1800-49', '1850-99'],
-                datasets: [
-                    {
-                        label: 'China',
-                        data: [2.26, 1.32, 1.23, 1.99],
-                        backgroundColor: '#315f50',
-                        borderColor: '#17231f',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Francia',
-                        data: [6.7, 11.4, null, null],
-                        backgroundColor: '#c49a52',
-                        borderColor: '#17231f',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Inglaterra',
-                        data: [8.9, 12.6, 17.2, 19.4],
-                        backgroundColor: '#a44c32',
-                        borderColor: '#17231f',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: { font: { size: 12 }, color: '#17231f' }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: { display: true, text: 'Días de Salario' },
-                        ticks: { color: '#65716b', font: { size: 11 } },
-                        grid: { color: 'rgba(49, 95, 80, 0.1)' }
-                    },
-                    x: {
-                        ticks: { color: '#65716b', font: { size: 11 } },
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
-    </script>
 </body>
 </html>
