@@ -30,11 +30,15 @@ Cómo un algoritmo de optimización (Google OR-Tools) decide qué barco visita q
 [Leer artículo →](posts/rutas-maritimas-chile.html){.post-card-link}
 :::
 
-::: {.post-card .post-card-placeholder}
-[Próximamente]{.post-card-tag}
+::: post-card
+[Historia Económica · Análisis Institucional]{.post-card-tag}
 
-### Nuevo artículo
+### [De la divergencia a la convergencia: Historia económica de China (960–2010s)](posts/china.html)
 
-Comming soon
+Cómo las instituciones que sostuvieron la estabilidad de la dinastía Qing limitaron la modernización — y cómo las reformas post-1978 permitieron la recuperación económica más rápida de la historia. Análisis basado en Brandt, Ma y Rawski (2014).
+
+[<i class="fa-regular fa-clock"></i> 15 min  ·  <i class="fa-solid fa-chart-bar"></i> Datos validados]{.post-card-meta}
+
+[Leer artículo →](posts/china.html){.post-card-link}
 :::
 ::::::
